@@ -1,87 +1,234 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { setAuth } from '../store/DataStore';
-import { Briefcase, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import './Login.css';
+import logoImg from '../assets/logo.jpeg';
 
 export default function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('krishnaniti@gmail.com');
+  const [password, setPassword] = useState('password123456');
   const [showPassword, setShowPassword] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const availableHeight = window.innerHeight - 68; // Account for 34px padding top+bottom
+      if (availableHeight < 750) {
+        setScale(availableHeight / 750);
+      } else {
+        setScale(1);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Initial check
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
     if (username && password) {
-      setAuth(true);
-      navigate('/products');
+      setIsLoggingIn(true);
+
+      // Simulate API delay as requested in the HTML script
+      setTimeout(() => {
+        setLoginSuccess(true);
+        setIsLoggingIn(false);
+
+        setTimeout(() => {
+          setAuth(true);
+          navigate('/products');
+        }, 800);
+      }, 1000);
     }
   };
 
   return (
-    <div className="flex-center" style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)', padding: '1rem' }}>
-      <div className="glass-panel animate-fade-in" style={{ padding: '3rem', width: '100%', maxWidth: '400px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div className="flex-center" style={{ marginBottom: '1.5rem' }}>
-            <img src="/logo.jpeg" alt="Codecraft Solutions Logo" style={{ width: '200px', height: 'auto', borderRadius: '12px' }} />
-          </div>
-          <h1 className="h2" style={{ color: 'var(--text-primary)' }}>Codecraft Solutions</h1>
-          <p className="text-muted" style={{ marginTop: '0.5rem' }}>Client Tracking Portal</p>
-        </div>
+    <div className={`login-page-body ${isDark ? 'dark-mode' : ''}`}>
+      <div 
+        className="login-wrapper" 
+        style={{ transform: `scale(${scale})`, transformOrigin: 'center center' }}
+      >
 
-        <form onSubmit={handleLogin}>
-          <div className="input-group">
-            <label htmlFor="username">Username</label>
-            <input 
-              type="text" 
-              id="username"
-              className="input-field" 
-              placeholder="admin"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-          </div>
-          
-          <div className="input-group">
-            <label htmlFor="password">Password</label>
-            <div style={{ position: 'relative' }}>
-              <input 
-                type={showPassword ? "text" : "password"} 
-                id="password"
-                className="input-field" 
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                style={{ paddingRight: '2.5rem' }}
-                required
-              />
-              <button 
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: 'absolute',
-                  right: '0.75rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--text-tertiary)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '0'
-                }}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
+        {/* =========================
+             LEFT BRANDING PANEL
+        ========================== */}
+        <section className="branding-panel">
+          <div className="wave"></div>
+          <div className="wave two"></div>
+          <div className="wave three"></div>
+
+          {/* Logo */}
+          <div className="brand">
+
+            <div className="brand-text">
+              <div className="brand-name">
+                CODECRAFT
+                <span>SOLUTIONS</span>
+              </div>
             </div>
           </div>
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
-            Login <ArrowRight size={18} />
+          {/* Hero */}
+          <div className="hero-content">
+            <h2 className="hero-title">
+              Track. Monitor.<br />
+              <span>Deliver.</span>
+            </h2>
+            <p className="hero-description">
+              Welcome back! Log in to access your projects,
+              updates, and client insights all in one place.
+            </p>
+
+
+
+            {/* Features */}
+            <div className="features">
+              <div className="feature">
+                <div className="feature-icon">♢</div>
+                <div className="feature-title">Secure</div>
+                <div className="feature-text">Your data is safe<br />with us.</div>
+              </div>
+              <div className="feature">
+                <div className="feature-icon">⚡</div>
+                <div className="feature-title">Fast</div>
+                <div className="feature-text">Quick access to<br />what matters.</div>
+              </div>
+              <div className="feature">
+                <div className="feature-icon">▥</div>
+                <div className="feature-title">Reliable</div>
+                <div className="feature-text">Insights you can<br />count on.</div>
+              </div>
+            </div>
+
+            {/* Quote */}
+            <div className="quote">
+              <div className="quote-mark">“</div>
+              <div>
+                Building digital solutions that drive<br />
+                success for your business.”
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================
+             RIGHT LOGIN PANEL
+        ========================== */}
+        <section className="form-panel">
+          <button
+            className="theme-toggle"
+            type="button"
+            onClick={() => setIsDark(!isDark)}
+          >
+            ◐ <span>{isDark ? 'Light' : 'Dark'}</span>
           </button>
-        </form>
+
+          <div className="form-inner">
+
+            {/* Header */}
+            <div className="form-header">
+              <div className="security-icon">♙</div>
+              <h1>Welcome Back</h1>
+              <p>Client Tracking Portal</p>
+              <div className="small-line"></div>
+            </div>
+
+            {/* Login Form */}
+            <form onSubmit={handleLogin}>
+
+              {/* Username */}
+              <div className="field">
+                <label htmlFor="username">USERNAME</label>
+                <div className="input-wrapper">
+                  <span className="input-icon">♙</span>
+                  <input
+                    id="username"
+                    type="email"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Enter your username"
+                    autoComplete="username"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div className="field">
+                <label htmlFor="password">PASSWORD</label>
+                <div className="input-wrapper">
+                  <span className="input-icon">♙</span>
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    autoComplete="current-password"
+                    required
+                  />
+                  <button
+                    className="password-toggle"
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    ◉
+                  </button>
+                </div>
+              </div>
+
+              {/* Options */}
+              <div className="form-options">
+                <label className="remember">
+                  <input type="checkbox" id="remember" />
+                  <span>Remember me</span>
+                </label>
+                <a href="#" className="forgot">Forgot Password?</a>
+              </div>
+
+              {/* Login Button */}
+              <button
+                type="submit"
+                className="login-btn"
+                style={{ opacity: isLoggingIn ? 0.8 : 1 }}
+                disabled={isLoggingIn || loginSuccess}
+              >
+                {isLoggingIn ? (
+                  <>
+                    <span>Signing in...</span>
+                    <span className="arrow">→</span>
+                  </>
+                ) : loginSuccess ? (
+                  <>
+                    <span>Login Successful</span>
+                    <span>✓</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Login</span>
+                    <span className="arrow">→</span>
+                  </>
+                )}
+              </button>
+            </form>
+
+
+
+            {/* Support */}
+            <div className="support">
+              Need help? <a href="#">Contact support</a>
+            </div>
+
+          </div>
+        </section>
       </div>
     </div>
   );

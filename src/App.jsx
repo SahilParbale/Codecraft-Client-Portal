@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Login';
 import ProductSelect from './pages/ProductSelect';
 import ClientTracker from './pages/ClientTracker';
+import ClientJourney from './pages/ClientJourney';
 import { getAuth } from './store/DataStore';
 
 // Protected Route Component
@@ -41,6 +42,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ClientTracker />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/tracker/:productId/client/:clientId" 
+          element={
+            <ProtectedRoute>
+              <ClientJourney />
             </ProtectedRoute>
           } 
         />

@@ -4,13 +4,10 @@ import { supabase } from '../supabaseClient';
 const PRODUCTS_KEY = 'codecraft_products';
 const AUTH_KEY = 'codecraft_auth';
 
-const politicalSchema = [
+const krishnanitiSchema = [
   { key: 'name', label: 'Name', type: 'text', required: true },
-  { key: 'position', label: 'Position', type: 'text', required: true },
-  { key: 'party', label: 'Party', type: 'text', required: true },
-  { key: 'called', label: 'Called', type: 'checkbox' },
-  { key: 'demoTime', label: 'Demo Time', type: 'datetime-local', required: true },
-  { key: 'result', label: 'Final Result', type: 'select', options: ['Pending', 'Follow-up', 'Closed Won', 'Closed Lost'] }
+  { key: 'position', label: 'Position', type: 'select', options: ['Minister', 'Khasdar', 'Aamdar', 'Nagarsevak'], required: true },
+  { key: 'party', label: 'Party', type: 'select', options: ['BJP', 'NCP', 'NCP-SP', 'Shiv Sena', 'Shiv Sena (UBT)', 'Congress', 'MNS', 'Other'], required: true }
 ];
 
 const genericSchema = [
@@ -38,11 +35,11 @@ const interviewSchema = [
 ];
 
 export const PRODUCTS = [
-  { id: 'prod-1', name: 'Krishnaniti ERP System', description: 'Comprehensive Enterprise Resource Planning', schema: politicalSchema },
-  { id: 'prod-4', name: 'Election Management System', description: 'Complete Election Tracking & Management', schema: politicalSchema },
-  { id: 'prod-3', name: 'SocialHub', description: 'Social Media Management Platform', schema: genericSchema },
-  { id: 'prod-5', name: 'AI Interview', description: 'Automated AI Interview & Screening', schema: interviewSchema },
-  { id: 'prod-2', name: 'Builder AI', description: 'AI-Powered App Builder', schema: builderSchema },
+  { id: 'prod-1', name: 'Krishnaniti ERP System', description: 'Comprehensive Enterprise Resource Planning', schema: krishnanitiSchema, isJourney: true },
+  { id: 'prod-4', name: 'Election Management System', description: 'Complete Election Tracking & Management', schema: krishnanitiSchema, isJourney: true },
+  { id: 'prod-3', name: 'SocialHub', description: 'Social Media Management Platform', schema: genericSchema, isJourney: false },
+  { id: 'prod-5', name: 'AI Interview', description: 'Automated AI Interview & Screening', schema: interviewSchema, isJourney: false },
+  { id: 'prod-2', name: 'Builder AI', description: 'Builder line project which gives 3d walkthrough then vr ar', schema: builderSchema, isJourney: false },
 ];
 
 export const getClients = async (productId) => {

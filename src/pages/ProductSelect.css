@@ -1,0 +1,330 @@
+/* src/pages/ProductSelect.css */
+
+.product-dash-body {
+    background-color: #fafafb; /* Very light gray/white */
+    height: 100vh;
+    width: 100vw;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Background SVGs */
+.bg-wave-top {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 1400px;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.bg-wave-bottom {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 600px;
+    max-width: 50vw;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Header */
+.modern-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background-color: white;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    position: relative;
+    z-index: 10;
+}
+
+.modern-header .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.modern-header .brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.modern-header .brand-name {
+    font-weight: 800;
+    font-size: 20px;
+    color: #1a1a1a;
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+}
+
+.modern-header .brand-sub {
+    font-size: 11px;
+    color: #888;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid rgba(128, 0, 0, 0.2);
+    border-radius: 8px;
+    background: transparent;
+    color: #800000;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    background: #fdf5f5;
+    border-color: #800000;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #800000;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+    cursor: pointer;
+    position: relative;
+}
+
+.user-avatar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.user-avatar-chevron {
+    color: #666;
+}
+
+/* Main Content Container */
+.dashboard-container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 40px 50px 80px;
+}
+
+/* Hero Section */
+.dash-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 40px;
+}
+
+.hero-text .title {
+    font-size: 36px;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+}
+
+.hero-text .subtitle {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 12px;
+}
+
+.hero-text .underline {
+    width: 50px;
+    height: 4px;
+    background-color: #800000;
+    border-radius: 2px;
+}
+
+/* Stats Pill */
+.stats-pill {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+    border-radius: 60px;
+    display: flex;
+    align-items: center;
+    padding: 10px 30px;
+    gap: 40px;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #fdf2f4;
+    color: #800000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1a1a1a;
+    line-height: 1.1;
+}
+
+.stat-label {
+    font-size: 15px;
+    color: #888;
+}
+
+.stat-divider {
+    width: 1px;
+    height: 40px;
+    background-color: #eee;
+}
+
+/* Product Grid */
+.modern-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 25px;
+}
+
+/* Product Card */
+.modern-card {
+    background: white;
+    border-radius: 16px;
+    padding: 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0,0,0,0.02);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modern-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
+}
+
+.card-body {
+    padding: 30px;
+    flex-grow: 1;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.card-icon {
+    width: 55px;
+    height: 55px;
+    border-radius: 14px;
+    background: #fdf2f4;
+    color: #800000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-menu {
+    color: #800000;
+    cursor: pointer;
+}
+
+.card-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+}
+
+.card-line {
+    width: 25px;
+    height: 3px;
+    background-color: #800000;
+    border-radius: 2px;
+    margin-bottom: 15px;
+}
+
+.card-desc {
+    font-size: 15px;
+    color: #666;
+    line-height: 1.5;
+}
+
+.card-footer {
+    background: #fafafb;
+    padding: 20px 30px;
+    border-top: 1px solid rgba(0,0,0,0.02);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #800000;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .dash-hero {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 20px;
+    }
+    .stats-pill {
+        flex-direction: column;
+        border-radius: 20px;
+        align-items: stretch;
+        padding: 20px;
+        gap: 20px;
+    }
+    .stat-divider {
+        width: 100%;
+        height: 1px;
+    }
+    .modern-grid {
+        grid-template-columns: 1fr;
+    }
+}

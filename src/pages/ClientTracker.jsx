@@ -87,14 +87,21 @@ export default function ClientTracker() {
     
     try {
       if (editingClientId) {
-        const updated = await updateClient(productId, editingClientId, formattedData);
-        if (updated) {
-          setClients(prev => prev.map(c => c.id === updated.id ? updated : c));
+        // Update
+        const updatedClient = await updateClient(productId, editingClientId, formattedData);
+        if (updatedClient) {
+          setClients(clients.map(c => c.id === editingClientId ? updatedClient : c));
         }
       } else {
-        const added = await addClient(productId, formattedData);
-        if (added) {
-          setClients(prev => [...prev, added]);
+        // Create
+        if (product.isJourney) {
+          formattedData.events = [];
+          formattedData.finalStatus = 'Pending';
+        }
+        
+        const newClient = await addClient(productId, formattedData);
+        if (newClient) {
+          setClients([...clients, newClient]);
         }
       }
       setIsModalOpen(false);
@@ -137,9 +144,7 @@ export default function ClientTracker() {
           <button onClick={() => navigate('/products')} className="btn btn-outline" style={{ padding: '0.5rem', border: 'none', background: 'transparent' }} title="Back to Products">
             <ArrowLeft size={24} />
           </button>
-          <div>
-            <img src="/logo.jpeg" alt="Codecraft Solutions Logo" style={{ width: '90px', height: 'auto', display: 'block', borderRadius: '8px' }} />
-          </div>
+
           <div>
             <h1 className="h3" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Package size={20} className="text-muted" />
@@ -149,52 +154,105 @@ export default function ClientTracker() {
           </div>
         </div>
         <button className="btn btn-primary" onClick={handleOpenAddModal}>
-          <UserPlus size={18} /> Add Client
+          <UserPlus size={18} /> Add {product.isJourney ? 'Lead' : 'Client'}
         </button>
       </header>
 
       <main className="container" style={{ marginTop: '2rem' }}>
-        
-        <div className="glass-panel" style={{ padding: '0' }}>
-          <div className="data-table-responsive">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Sr No</th>
-                  {product.schema.map(field => (
-                    <th key={field.key}>{field.label}</th>
-                  ))}
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {clients.length === 0 ? (
+        {product.isJourney ? (
+          ['Minister', 'Khasdar', 'Aamdar', 'Nagarsevak'].map(position => {
+            const positionClients = clients.filter(c => c.position === position);
+            return (
+              <div key={position} style={{ marginBottom: '3rem' }}>
+                <h2 className="h4" style={{ marginBottom: '1rem', color: 'var(--accent-color)' }}>{position} Leads</h2>
+                <div className="glass-panel" style={{ padding: '0' }}>
+                  <div className="data-table-responsive" style={{ maxHeight: 'none' }}>
+                    <table className="data-table">
+                      <thead>
+                        <tr>
+                          <th>Sr No</th>
+                          <th>Name</th>
+                          <th>Party</th>
+                          <th>Total Events</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {positionClients.length === 0 ? (
+                          <tr>
+                            <td colSpan="5" style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
+                              No {position} leads tracked yet.
+                            </td>
+                          </tr>
+                        ) : (
+                          positionClients.map((client, index) => (
+                            <tr 
+                              key={client.id} 
+                              onClick={() => navigate(`/tracker/${productId}/client/${client.id}`, { state: { client } })}
+                              style={{ cursor: 'pointer' }}
+                              title="Click to view CRM Timeline"
+                            >
+                              <td style={{ fontWeight: 500, color: 'var(--text-secondary)' }}>{index + 1}</td>
+                              <td style={{ fontWeight: 600 }}>{client.name}</td>
+                              <td>{client.party}</td>
+                              <td>{client.events ? client.events.length : 0} Interactions</td>
+                              <td>
+                                <span className="status-badge" style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)' }}>
+                                  {client.finalStatus || 'Pending'}
+                                </span>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <div className="glass-panel" style={{ padding: '0' }}>
+            <div className="data-table-responsive">
+              <table className="data-table">
+                <thead>
                   <tr>
-                    <td colSpan={product.schema.length + 2} style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
-                      No clients tracked for {product.name} yet. Click "Add Client" to get started.
-                    </td>
+                    <th>Sr No</th>
+                    {product.schema.map(field => <th key={field.key}>{field.label}</th>)}
+                    <th>Actions</th>
                   </tr>
-                ) : (
-                  clients.map((client, index) => (
-                    <tr key={client.id}>
-                      <td style={{ fontWeight: 500, color: 'var(--text-secondary)' }}>{index + 1}</td>
-                      {product.schema.map(field => (
-                        <td key={field.key}>
-                          {renderTableCell(field, client[field.key])}
-                        </td>
-                      ))}
-                      <td>
-                        <button className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', display: 'flex', gap: '0.25rem', alignItems: 'center', fontSize: '0.75rem' }} onClick={() => handleEditClient(client)}>
-                          <Edit2 size={14} /> Edit
-                        </button>
+                </thead>
+                <tbody>
+                  {clients.length === 0 ? (
+                    <tr>
+                      <td colSpan={product.schema.length + 2} style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
+                        No clients tracked for {product.name} yet. Click "Add Client" to get started.
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : (
+                    clients.map((client, index) => (
+                      <tr key={client.id}>
+                        <td style={{ fontWeight: 500, color: 'var(--text-secondary)' }}>{index + 1}</td>
+                        {product.schema.map(field => (
+                          <td key={field.key}>
+                            {renderTableCell(field, client[field.key])}
+                          </td>
+                        ))}
+                        <td>
+                          <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <button className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', display: 'flex', gap: '0.25rem', alignItems: 'center', fontSize: '0.75rem' }} onClick={() => handleEditClient(client)}>
+                              <Edit2 size={14} /> Edit
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        )}
       </main>
       </div>
 

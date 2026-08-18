@@ -1,10 +1,54 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PRODUCTS, logout } from '../store/DataStore';
-import { Package, LogOut, ChevronRight } from 'lucide-react';
+import { 
+  LogOut, 
+  ChevronRight, 
+  LayoutGrid, 
+  Users, 
+  TrendingUp, 
+  Building2, 
+  Vote, 
+  Share2, 
+  Bot, 
+  MoreHorizontal,
+  BrainCircuit,
+  Cpu,
+  ChevronDown
+} from 'lucide-react';
+import './ProductSelect.css';
+
+// Helper to get icon based on product name
+const getProductIcon = (name) => {
+  if (name.includes('ERP')) return <Building2 size={24} strokeWidth={2.5} />;
+  if (name.includes('Election')) return <Vote size={24} strokeWidth={2.5} />;
+  if (name.includes('SocialHub')) return <Users size={24} strokeWidth={2.5} />;
+  if (name.includes('Interview')) return <BrainCircuit size={24} strokeWidth={2.5} />;
+  if (name.includes('Builder')) return <Bot size={24} strokeWidth={2.5} />;
+  return <LayoutGrid size={24} strokeWidth={2.5} />;
+};
 
 export default function ProductSelect() {
   const navigate = useNavigate();
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const handleResize = () => {
+      // Header is approx 70px.
+      // Content needs about 850px.
+      const availableHeight = window.innerHeight - 70;
+      if (availableHeight < 850) {
+        setScale(availableHeight / 850);
+      } else {
+        setScale(1);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -12,35 +56,130 @@ export default function ProductSelect() {
   };
 
   return (
-    <div className="animate-fade-in" style={{ paddingBottom: '4rem' }}>
-      <header className="app-header glass-panel" style={{ borderRadius: 0, borderTop: 0, borderLeft: 0, borderRight: 0 }}>
-        <div className="header-content">
-          <div><img src="/logo.jpeg" alt="Codecraft Solutions Logo" style={{ width: '90px', height: 'auto', display: 'block', borderRadius: '8px' }} /></div>
-          <h1 className="h3">Product Dashboards</h1>
+    <div className="product-dash-body">
+      
+      {/* Decorative SVG Backgrounds */}
+      <svg className="bg-wave-top" viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg">
+        <path fill="url(#wave-gradient)" fillOpacity="0.3" d="M0,160L48,149.3C96,139,192,117,288,112C384,107,480,117,576,144C672,171,768,213,864,208C960,203,1056,149,1152,133.3C1248,117,1344,139,1392,149.3L1440,160L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+        <path fill="url(#wave-gradient)" fillOpacity="0.2" d="M0,192L48,197.3C96,203,192,213,288,208C384,203,480,181,576,170.7C672,160,768,160,864,181.3C960,203,1056,245,1152,240C1248,235,1344,181,1392,154.7L1440,128L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+        <defs>
+          <linearGradient id="wave-gradient" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#fdf2f4" />
+            <stop offset="50%" stopColor="#f8d7da" />
+            <stop offset="100%" stopColor="#fdf2f4" />
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <svg className="bg-wave-bottom" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#800000" d="M300,600 C150,550 50,450 0,300 C-50,150 150,50 300,0 L800,0 L800,600 Z" opacity="0.9"/>
+        <path fill="#a52a2a" d="M400,600 C250,550 150,450 100,300 C50,150 250,50 400,0 L800,0 L800,600 Z" opacity="0.7"/>
+        <pattern id="dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+          <circle fill="rgba(255,255,255,0.1)" cx="2" cy="2" r="2"></circle>
+        </pattern>
+        <path fill="url(#dots)" d="M400,600 C250,550 150,450 100,300 C50,150 250,50 400,0 L800,0 L800,600 Z"/>
+      </svg>
+
+
+      {/* Header */}
+      <header className="modern-header">
+        <div className="logo-container">
+          <div className="brand-text">
+            <span className="brand-name">CODECRAFT</span>
+            <span className="brand-sub">SOLUTIONS</span>
+          </div>
         </div>
-        <button onClick={handleLogout} className="btn btn-outline" style={{ padding: '0.5rem 1rem' }}>
-          <LogOut size={16} /> Logout
-        </button>
+        
+        <div className="header-actions">
+          <button onClick={handleLogout} className="logout-btn">
+            <LogOut size={16} strokeWidth={2.5} /> Logout
+          </button>
+          <div className="user-avatar-wrap">
+            <div className="user-avatar">K</div>
+            <ChevronDown size={16} className="user-avatar-chevron" />
+          </div>
+        </div>
       </header>
 
-      <main className="container" style={{ marginTop: '2rem' }}>
-        <div className="product-grid">
+      {/* Main Content */}
+      <main 
+        className="dashboard-container" 
+        style={{ 
+          transform: `scale(${scale})`, 
+          transformOrigin: 'top left',
+          width: `${(1 / scale) * 100}%`
+        }}
+      >
+        
+        <div className="dash-hero">
+          <div className="hero-text animate-fade-in">
+            <h1 className="title">Product Dashboards</h1>
+            <p className="subtitle">Manage and monitor all your products</p>
+            <div className="underline"></div>
+          </div>
+
+          <div className="stats-pill animate-fade-in" style={{ animationDelay: '0.1s' }}>
+            <div className="stat-item">
+              <div className="stat-icon">
+                <LayoutGrid size={22} strokeWidth={2.5} />
+              </div>
+              <div className="stat-content">
+                <span className="stat-value">5</span>
+                <span className="stat-label">Total Products</span>
+              </div>
+            </div>
+            <div className="stat-divider"></div>
+            
+            <div className="stat-item">
+              <div className="stat-icon">
+                <Users size={22} strokeWidth={2.5} />
+              </div>
+              <div className="stat-content">
+                <span className="stat-value">128</span>
+                <span className="stat-label">Active Clients</span>
+              </div>
+            </div>
+            <div className="stat-divider"></div>
+
+            <div className="stat-item">
+              <div className="stat-icon">
+                <TrendingUp size={22} strokeWidth={2.5} />
+              </div>
+              <div className="stat-content">
+                <span className="stat-value">98%</span>
+                <span className="stat-label">System Uptime</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="modern-grid">
           {PRODUCTS.map((product, index) => (
             <div 
               key={product.id} 
-              className="product-card"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              className="modern-card animate-fade-in"
+              style={{ animationDelay: `${0.2 + (index * 0.1)}s` }}
               onClick={() => navigate(`/tracker/${product.id}`)}
             >
-              <h2 className="h2" style={{ fontSize: '1.5rem' }}>{product.name}</h2>
-              <p className="text-muted" style={{ lineHeight: '1.6' }}>{product.description}</p>
+              <div className="card-body">
+                <div className="card-header">
+                  <div className="card-icon">
+                    {getProductIcon(product.name)}
+                  </div>
+                  <MoreHorizontal size={24} className="card-menu" />
+                </div>
+                <h2 className="card-title">{product.name}</h2>
+                <div className="card-line"></div>
+                <p className="card-desc">{product.description}</p>
+              </div>
               
-              <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', color: 'var(--accent-color)', fontWeight: 600, fontSize: '0.9375rem' }}>
-                Manage Clients <ChevronRight size={18} style={{ marginLeft: '4px' }} />
+              <div className="card-footer">
+                Manage Clients <ChevronRight size={18} strokeWidth={2.5} />
               </div>
             </div>
           ))}
         </div>
+
       </main>
     </div>
   );

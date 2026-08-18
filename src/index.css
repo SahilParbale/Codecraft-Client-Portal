@@ -1,23 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Colors - Modern Professional Theme */
-  --bg-primary: #f0f4f8; /* Soft slate/blue-gray background */
+  /* Colors - Maroon & White Theme */
+  --bg-primary: #ffffff; /* White background */
   --bg-secondary: #ffffff;
-  --bg-tertiary: #f8fafc;
+  --bg-tertiary: #f8f9fa; /* Very light gray for subtle contrast */
   
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-tertiary: #94a3b8;
+  --text-primary: #1a1a1a; /* Almost black */
+  --text-secondary: #555555;
+  --text-tertiary: #888888;
   
-  /* Vibrant, Professional Accents from Logo */
-  --accent-color: #0052ff; /* Deep vibrant blue */
-  --accent-hover: #7b2cbf; /* Vibrant purple */
-  --accent-light: #e0e7ff;
-  --gradient-primary: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 50%, #7b2cbf 100%);
-  --gradient-button: linear-gradient(135deg, #0052ff 0%, #7b2cbf 100%);
+  /* Maroon Accents */
+  --accent-color: #800000; /* Maroon */
+  --accent-hover: #5a0000; /* Dark Maroon */
+  --accent-light: #fdf5f5; /* Very light maroon tint */
+  --gradient-primary: linear-gradient(135deg, #800000 0%, #a52a2a 100%);
+  --gradient-button: linear-gradient(135deg, #800000 0%, #a52a2a 100%);
   
-  --border-color: #e2e8f0;
+  --border-color: #e5e5e5;
   
   /* Status Colors */
   --success: #059669;
@@ -30,18 +30,18 @@
   /* Typography */
   --font-family: 'Inter', system-ui, -apple-system, sans-serif;
   
-  /* Premium Shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-  --shadow-lg: 0 10px 25px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  --shadow-glow: 0 0 20px rgba(79, 70, 229, 0.35);
+  /* Premium Shadows - Removed for flat theme */
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
+  --shadow-glow: none;
 
   /* Radii */
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1.25rem;
-  --radius-full: 9999px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-full: 0px;
 
   /* Transitions */
   --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -54,14 +54,27 @@
   padding: 0;
 }
 
+/* Custom Theme Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
 body {
   font-family: var(--font-family);
   background-color: var(--bg-primary);
-  /* Subtle mesh gradient background */
-  background-image: 
-    radial-gradient(at 0% 0%, hsla(253,16%,7%,0.03) 0, transparent 50%), 
-    radial-gradient(at 50% 0%, hsla(225,39%,30%,0.03) 0, transparent 50%), 
-    radial-gradient(at 100% 0%, hsla(339,49%,30%,0.03) 0, transparent 50%);
+  background-color: var(--bg-primary);
+  /* background-image removed for solid simple theme */
   color: var(--text-primary);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -191,17 +204,17 @@ input[type="datetime-local"].input-field::-webkit-calendar-picker-indicator:hove
 .btn-primary {
   background: var(--gradient-button);
   color: white;
-  box-shadow: 0 4px 12px rgba(0, 82, 255, 0.3);
+  box-shadow: none;
 }
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-glow);
+  box-shadow: none;
 }
 .btn-outline {
   background-color: var(--bg-secondary);
   border: 2px solid var(--border-color);
   color: var(--text-secondary);
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
 }
 .btn-outline:hover {
   border-color: var(--text-primary);
@@ -230,7 +243,7 @@ input[type="datetime-local"].input-field::-webkit-calendar-picker-indicator:hove
   position: sticky;
   top: 0;
   z-index: 50;
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
 }
 
 /* Modal Styles */
@@ -261,7 +274,7 @@ input[type="datetime-local"].input-field::-webkit-calendar-picker-indicator:hove
   padding: 2.5rem;
   width: 100%;
   max-width: 750px;
-  box-shadow: var(--shadow-xl);
+  box-shadow: none;
   border: 1px solid var(--border-color);
   margin: auto; /* Centers it vertically if viewport is taller than modal */
   transform: translateY(0);
@@ -330,8 +343,7 @@ input[type="datetime-local"].input-field::-webkit-calendar-picker-indicator:hove
   position: sticky;
   top: 0;
   z-index: 10;
-  /* Box shadow instead of border-bottom prevents the border from scrolling away */
-  box-shadow: 0 1px 0 var(--border-color);
+  border-bottom: 1px solid var(--border-color);
 }
 .data-table th,
 .data-table td {
@@ -377,7 +389,7 @@ input[type="datetime-local"].input-field::-webkit-calendar-picker-indicator:hove
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  box-shadow: none;
   overflow: hidden;
 }
 .product-card::before {
@@ -394,8 +406,8 @@ input[type="datetime-local"].input-field::-webkit-calendar-picker-indicator:hove
 }
 .product-card:hover {
   transform: translateY(-8px);
-  box-shadow: var(--shadow-xl);
-  border-color: transparent;
+  box-shadow: none;
+  border-color: var(--text-primary);
 }
 .product-card:hover::before {
   transform: scaleX(1);
@@ -409,7 +421,7 @@ input[type="datetime-local"].input-field::-webkit-calendar-picker-indicator:hove
   border: 1px solid var(--border-color) !important;
   border-radius: var(--radius-md) !important;
   background-color: var(--bg-secondary) !important;
-  box-shadow: var(--shadow-lg) !important;
+  box-shadow: none !important;
 }
 .react-datepicker__header {
   background-color: var(--bg-tertiary) !important;
