@@ -200,6 +200,7 @@
 .table-scroll-wrap {
     max-height: 270px; /* limits to approx 4 rows before scrolling */
     overflow-y: auto;
+    overflow-x: auto;
 }
 
 .leads-table {
@@ -342,4 +343,35 @@
     width: 100%;
     max-width: 600px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .tracker-header {
+        padding: 15px 20px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .tracker-container {
+        padding: 20px 15px 40px;
+    }
+    .tracker-title {
+        font-size: 14px;
+    }
+    .tracker-subtitle {
+        display: none;
+    }
+    .table-scroll-wrap {
+        overflow-x: auto;
+    }
+    .leads-table th, .leads-table td {
+        white-space: nowrap;
+    }
+    .modal-content {
+        padding: 20px;
+        width: 90%;
+    }
+    .modal-grid {
+        grid-template-columns: 1fr !important;
+    }
 }

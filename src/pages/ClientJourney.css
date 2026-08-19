@@ -428,3 +428,41 @@
     color: #475569;
     line-height: 1.5;
 }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .journey-header {
+        padding: 15px 20px;
+    }
+    .journey-container {
+        padding: 10px 20px 40px;
+    }
+    .journey-name {
+        font-size: 22px;
+    }
+    .journey-title-section {
+        margin-bottom: 20px;
+    }
+    .progress-container {
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+    .progress-step {
+        min-width: 100px;
+    }
+    .progress-line {
+        /* Adjust absolute line to stretch if content scrolls */
+        right: auto;
+        width: calc(100px * 6 - 80px); /* 6 steps * 100px - padding */
+    }
+    .journey-grid {
+        grid-template-columns: 1fr;
+    }
+    .logger-tabs {
+        flex-wrap: wrap;
+    }
+    .logger-tab {
+        padding: 12px;
+        font-size: 12px;
+    }
+}

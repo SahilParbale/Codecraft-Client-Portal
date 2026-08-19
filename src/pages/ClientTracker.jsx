@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { PRODUCTS, getClients, addClient, updateClient } from '../store/DataStore';
 import { 
-  X, Check, Minus, Edit2, Search, Plus, Bell, Code, FileText, Building2
+  X, Check, Minus, Edit2, Search, Plus, Bell, Code, FileText, Building2, Download
 } from 'lucide-react';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import './ClientTracker.css';
 
 export default function ClientTracker() {
@@ -104,6 +106,145 @@ export default function ClientTracker() {
     }
   };
 
+  const downloadReport = (title, clientData) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    
+    // Add Centered Professional Header
+    doc.setFontSize(22);
+    doc.setTextColor(128, 0, 0); // Maroon
+    doc.setFont('helvetica', 'bold');
+    doc.text(title.toUpperCase(), pageWidth / 2, 22, { align: 'center' });
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Project: ${product.name}`, pageWidth / 2, 28, { align: 'center' });
+    doc.text(`Generated on: ${new Date().toLocaleString()}`, pageWidth / 2, 33, { align: 'center' });
+    doc.text(`Total Clients: ${clientData.length}`, pageWidth / 2, 38, { align: 'center' });
+
+    // Draw solid header line
+    doc.setDrawColor(128, 0, 0);
+    doc.setLineWidth(0.5);
+    doc.line(20, 44, pageWidth - 20, 44);
+    doc.setLineWidth(0.1); // reset
+
+    let finalY = 55;
+
+    if (product.isJourney) {
+      clientData.forEach((c, index) => {
+        const pageHeight = doc.internal.pageSize.height;
+        // Estimate total height needed for this client block (Base 60px + ~15px per event)
+        const estimatedHeight = 60 + (c.events && c.events.length > 0 ? c.events.length * 15 + 15 : 15);
+        
+        // If there isn't enough room for this client AND we aren't already at the top of a page, break to new page
+        if (finalY + estimatedHeight > pageHeight - 20 && finalY > 40) {
+          doc.addPage();
+          finalY = 20;
+        }
+
+        // Draw a separator line between clients (if not at top of page)
+        if (index !== 0 && finalY > 20) {
+           doc.setDrawColor(220, 220, 220);
+           doc.line(20, finalY, 190, finalY);
+           finalY += 15;
+        }
+
+        // Client Name with Numbering
+        doc.setFontSize(16);
+        doc.setTextColor(128, 0, 0); // Maroon
+        doc.setFont('helvetica', 'bold');
+        doc.text(`Client ${index + 1}: ${c.name || 'Unnamed Lead'}`, 20, finalY);
+        finalY += 4;
+
+        // Client Details Table (Horizontal Grid)
+        autoTable(doc, {
+            startY: finalY,
+            head: [['Party', 'Current Status', 'Date Added']],
+            body: [
+              [c.party || '-', c.finalStatus || 'Pending', new Date(c.createdAt).toLocaleDateString()]
+            ],
+            theme: 'grid',
+            headStyles: { fillColor: [240, 240, 240], textColor: [50, 50, 50], fontStyle: 'bold' },
+            styles: { cellPadding: 4, fontSize: 10, textColor: [50, 50, 50] },
+            margin: { left: 20, right: 20 }
+        });
+        
+        finalY = doc.lastAutoTable.finalY + 12;
+
+        // Activity Logs Header
+        doc.setFontSize(12);
+        doc.setTextColor(128, 0, 0);
+        doc.setFont('helvetica', 'bold');
+        doc.text("Activity Logs", 20, finalY);
+        finalY += 6;
+
+        if (!c.events || c.events.length === 0) {
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.setFont('helvetica', 'italic');
+            doc.text("No activities logged yet.", 20, finalY);
+            finalY += 15;
+        } else {
+            const eventData = c.events.map(evt => [
+               new Date(evt.date).toLocaleString(),
+               evt.type,
+               (evt.details || '').replace(/\n/g, ' ')
+            ]);
+
+            autoTable(doc, {
+               startY: finalY,
+               head: [['Date & Time', 'Action', 'Notes']],
+               body: eventData,
+               theme: 'grid',
+               headStyles: { fillColor: [128, 0, 0], textColor: [255, 255, 255] },
+               styles: { fontSize: 9, cellPadding: 5, textColor: [51, 65, 85], overflow: 'linebreak' },
+               columnStyles: { 
+                 0: { cellWidth: 40 },
+                 1: { cellWidth: 35, fontStyle: 'bold' },
+                 2: { cellWidth: 'auto' }
+               },
+               margin: { left: 20, right: 20 }
+            });
+            finalY = doc.lastAutoTable.finalY + 20;
+        }
+      });
+    } else {
+      const headers = product.schema.map(f => f.label);
+      const tableData = clientData.map(c => {
+        return product.schema.map(f => {
+           let val = c[f.key] || '-';
+           if (f.type === 'datetime-local' && val !== '-') {
+             val = new Date(val).toLocaleString();
+           }
+           return val;
+        });
+      });
+
+      autoTable(doc, {
+        startY: finalY,
+        head: [headers],
+        body: tableData,
+        theme: 'grid',
+        headStyles: { fillColor: [128, 0, 0], textColor: 255 },
+        styles: { fontSize: 9, cellPadding: 5 },
+        margin: { left: 20, right: 20 }
+      });
+    }
+
+    // Add page numbers footer
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(9);
+      doc.setTextColor(150, 150, 150);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+    }
+
+    doc.save(`${title.replace(/\s+/g, '_')}_Report.pdf`);
+  };
+
   if (!product) return null;
 
   const renderBadge = (status) => {
@@ -128,7 +269,15 @@ export default function ClientTracker() {
       </header>
 
       <main className="tracker-container animate-fade-in">
-        <div className="tracker-top-action">
+        <div className="tracker-top-action" style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginBottom: '30px' }}>
+          {!product.isJourney && clients.length > 0 && (
+             <button 
+                onClick={() => downloadReport(`${product.name} Leads`, clients)}
+                style={{ background: 'white', border: '1px solid #e2e8f0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+              >
+                <Download size={16} /> Export Report
+             </button>
+          )}
           <button className="btn-add-lead" onClick={handleOpenAddModal}>
             <Plus size={16} strokeWidth={3} /> Add Lead
           </button>
@@ -140,11 +289,21 @@ export default function ClientTracker() {
             
             return (
               <div key={position} className="lead-category">
-                <div className="category-header">
-                  <div className="category-icon">
-                    <Building2 size={16} strokeWidth={2} />
+                <div className="category-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div className="category-icon">
+                      <Building2 size={16} strokeWidth={2} />
+                    </div>
+                    <span className="category-title">{position} Leads</span>
                   </div>
-                  <span className="category-title">{position} Leads</span>
+                  {positionClients.length > 0 && (
+                    <button 
+                      onClick={() => downloadReport(`${position} Leads`, positionClients)}
+                      style={{ background: 'transparent', border: '1px solid #e2e8f0', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                    >
+                      <Download size={14} /> Report
+                    </button>
+                  )}
                 </div>
                 
                 <div className="table-card">
