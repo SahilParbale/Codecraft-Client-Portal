@@ -374,4 +374,17 @@
     .modal-grid {
         grid-template-columns: 1fr !important;
     }
+    .tracker-top-action {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+    }
+    .tracker-top-action button {
+        width: 100%;
+        justify-content: center;
+    }
+    .category-header {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
 }
