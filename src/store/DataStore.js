@@ -113,14 +113,14 @@ export const updateClient = async (productId, clientId, updatedData) => {
 };
 
 export const setAuth = (isLoggedIn) => {
-  localStorage.setItem(AUTH_KEY, JSON.stringify({ isLoggedIn }));
+  sessionStorage.setItem(AUTH_KEY, JSON.stringify({ isLoggedIn }));
 };
 
 export const getAuth = () => {
-  const auth = JSON.parse(localStorage.getItem(AUTH_KEY) || '{"isLoggedIn": false}');
+  const auth = JSON.parse(sessionStorage.getItem(AUTH_KEY) || '{"isLoggedIn": false}');
   return auth.isLoggedIn;
 };
 
 export const logout = () => {
-  localStorage.removeItem(AUTH_KEY);
+  sessionStorage.removeItem(AUTH_KEY);
 };

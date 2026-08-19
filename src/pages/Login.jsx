@@ -6,7 +6,7 @@ import logoImg from '../assets/logo.jpeg';
 
 export default function Login() {
   const [username, setUsername] = useState('krishnaniti@gmail.com');
-  const [password, setPassword] = useState('password123456');
+  const [password, setPassword] = useState('Krishnaniti123');
   const [showPassword, setShowPassword] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -33,7 +33,7 @@ export default function Login() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (username && password) {
+    if (username === 'krishnaniti@gmail.com' && password === 'Krishnaniti123') {
       setIsLoggingIn(true);
 
       // Simulate API delay as requested in the HTML script
@@ -46,6 +46,8 @@ export default function Login() {
           navigate('/products');
         }, 800);
       }, 1000);
+    } else {
+      alert("Invalid Username or Password!");
     }
   };
 
