@@ -61,6 +61,19 @@ export const getClients = async (productId) => {
   }));
 };
 
+export const getTotalClientsCount = async () => {
+  const { count, error } = await supabase
+    .from('clients')
+    .select('*', { count: 'exact', head: true });
+    
+  if (error) {
+    console.error('Error fetching total clients count:', error);
+    return 0;
+  }
+  
+  return count || 0;
+};
+
 export const addClient = async (productId, clientData) => {
   const { data, error } = await supabase
     .from('clients')

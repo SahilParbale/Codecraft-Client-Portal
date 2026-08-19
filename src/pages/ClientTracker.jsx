@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { PRODUCTS, getClients, addClient, updateClient } from '../store/DataStore';
-import { ArrowLeft, UserPlus, X, Check, Minus, Edit2, Package, Search, Plus } from 'lucide-react';
+import { 
+  X, Check, Minus, Edit2, Search, Plus, Bell, Code, FileText, Building2
+} from 'lucide-react';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import './ClientTracker.css';
 
 export default function ClientTracker() {
   const { productId } = useParams();
@@ -24,12 +27,10 @@ export default function ClientTracker() {
       navigate('/products');
       return;
     }
-    
     const fetchClients = async () => {
       const data = await getClients(productId);
       setClients(data);
     };
-    
     fetchClients();
   }, [productId, product, navigate]);
 
@@ -55,7 +56,6 @@ export default function ClientTracker() {
   const handleEditClient = (client) => {
     setEditingClientId(client.id);
     const editData = { ...client };
-    // Convert string ISO dates back to Date objects for the DatePicker
     product.schema.forEach(field => {
       if (field.type === 'datetime-local' && editData[field.key]) {
         editData[field.key] = new Date(editData[field.key]);
@@ -71,8 +71,6 @@ export default function ClientTracker() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // basic validation
     const missingRequired = product.schema.some(f => f.required && !formData[f.key]);
     if (missingRequired) return;
 
@@ -84,21 +82,17 @@ export default function ClientTracker() {
     });
 
     setIsSubmitting(true);
-    
     try {
       if (editingClientId) {
-        // Update
         const updatedClient = await updateClient(productId, editingClientId, formattedData);
         if (updatedClient) {
           setClients(clients.map(c => c.id === editingClientId ? updatedClient : c));
         }
       } else {
-        // Create
         if (product.isJourney) {
           formattedData.events = [];
           formattedData.finalStatus = 'Pending';
         }
-        
         const newClient = await addClient(productId, formattedData);
         if (newClient) {
           setClients([...clients, newClient]);
@@ -110,241 +104,205 @@ export default function ClientTracker() {
     }
   };
 
-  const renderTableCell = (field, value) => {
-    if (field.type === 'checkbox') {
-      return value ? <Check size={18} className="text-success" style={{ color: 'var(--success)' }}/> : <Minus size={18} className="text-muted" style={{ opacity: 0.3 }}/>;
-    }
-    if (field.type === 'datetime-local') {
-      if (!value) return '-';
-      return new Date(value).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
-    }
-    if (field.key === 'result') {
-      const isWon = value?.includes('Won');
-      const isLost = value?.includes('Lost');
-      return (
-        <span className="status-badge" style={{
-          backgroundColor: isWon ? 'var(--success-bg)' : isLost ? 'var(--danger-bg)' : 'var(--bg-primary)',
-          color: isWon ? 'var(--success)' : isLost ? 'var(--danger)' : 'var(--text-primary)',
-          border: '1px solid var(--border-color)'
-        }}>
-          {value || '-'}
-        </span>
-      );
-    }
-    return value || '-';
-  };
-
   if (!product) return null;
 
-  return (
-    <>
-      <div className="animate-fade-in" style={{ paddingBottom: '4rem' }}>
-        <header className="app-header glass-panel" style={{ borderRadius: 0, borderTop: 0, borderLeft: 0, borderRight: 0 }}>
-        <div className="header-content">
-          <button onClick={() => navigate('/products')} className="btn btn-outline" style={{ padding: '0.5rem', border: 'none', background: 'transparent' }} title="Back to Products">
-            <ArrowLeft size={24} />
-          </button>
+  const renderBadge = (status) => {
+    const s = status ? status.toLowerCase() : 'pending';
+    if (s.includes('closed') || s.includes('won')) return <span className="badge badge-closed">{status}</span>;
+    if (s.includes('demo')) return <span className="badge badge-demo">{status}</span>;
+    return <span className="badge badge-pending">{status || 'PENDING'}</span>;
+  };
 
-          <div>
-            <h1 className="h3" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Package size={20} className="text-muted" />
-              {product.name}
-            </h1>
-            <p className="text-muted" style={{ fontSize: '0.875rem' }}>Track interactions and conversions</p>
+  return (
+    <div className="tracker-body">
+      <header className="tracker-header">
+        <div className="tracker-brand" style={{ cursor: 'pointer' }} onClick={() => navigate('/products')}>
+          <div className="tracker-logo">
+            <Code size={20} strokeWidth={2.5} />
+          </div>
+          <div className="brand-text-container">
+            <span className="tracker-title">Krishnaniti ERP System</span>
+            <span className="tracker-subtitle">Track interactions and conversions</span>
           </div>
         </div>
-        <button className="btn btn-primary" onClick={handleOpenAddModal}>
-          <UserPlus size={18} /> Add {product.isJourney ? 'Lead' : 'Client'}
-        </button>
       </header>
 
-      <main className="container" style={{ marginTop: '2rem' }}>
+      <main className="tracker-container animate-fade-in">
+        <div className="tracker-top-action">
+          <button className="btn-add-lead" onClick={handleOpenAddModal}>
+            <Plus size={16} strokeWidth={3} /> Add Lead
+          </button>
+        </div>
+
         {product.isJourney ? (
-          ['Minister', 'Khasdar', 'Aamdar', 'Nagarsevak'].map(position => {
+          ['Minister', 'Khasdar', 'Aamdar', 'Nagarsevak'].map((position, pIdx) => {
             const positionClients = clients.filter(c => c.position === position);
+            
             return (
-              <div key={position} style={{ marginBottom: '3rem' }}>
-                <h2 className="h4" style={{ marginBottom: '1rem', color: 'var(--accent-color)' }}>{position} Leads</h2>
-                <div className="glass-panel" style={{ padding: '0' }}>
-                  <div className="data-table-responsive" style={{ maxHeight: 'none' }}>
-                    <table className="data-table">
-                      <thead>
-                        <tr>
-                          <th>Sr No</th>
-                          <th>Name</th>
-                          <th>Party</th>
-                          <th>Total Events</th>
-                          <th>Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {positionClients.length === 0 ? (
-                          <tr>
-                            <td colSpan="5" style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
-                              No {position} leads tracked yet.
-                            </td>
-                          </tr>
-                        ) : (
-                          positionClients.map((client, index) => (
-                            <tr 
-                              key={client.id} 
-                              onClick={() => navigate(`/tracker/${productId}/client/${client.id}`, { state: { client } })}
-                              style={{ cursor: 'pointer' }}
-                              title="Click to view CRM Timeline"
-                            >
-                              <td style={{ fontWeight: 500, color: 'var(--text-secondary)' }}>{index + 1}</td>
-                              <td style={{ fontWeight: 600 }}>{client.name}</td>
-                              <td>{client.party}</td>
-                              <td>{client.events ? client.events.length : 0} Interactions</td>
-                              <td>
-                                <span className="status-badge" style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)' }}>
-                                  {client.finalStatus || 'Pending'}
-                                </span>
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
+              <div key={position} className="lead-category">
+                <div className="category-header">
+                  <div className="category-icon">
+                    <Building2 size={16} strokeWidth={2} />
                   </div>
+                  <span className="category-title">{position} Leads</span>
+                </div>
+                
+                <div className="table-card">
+                  <div className="table-scroll-wrap">
+                    <table className="leads-table">
+                    <thead>
+                      <tr>
+                        <th className="col-sr">SR NO</th>
+                        <th className="col-name">NAME</th>
+                        <th className="col-party">PARTY</th>
+                        <th className="col-events">TOTAL EVENTS</th>
+                        <th>STATUS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {positionClients.length === 0 ? (
+                        <tr>
+                          <td colSpan="5" style={{ padding: 0 }}>
+                            <div className="empty-state">
+                              <div className="empty-icon-wrap">
+                                <FileText size={24} strokeWidth={1.5} />
+                              </div>
+                              <div className="empty-title">No {position} leads tracked yet.</div>
+                              <div className="empty-subtitle">Start by adding a new lead to track interactions and conversions.</div>
+                            </div>
+                          </td>
+                        </tr>
+                      ) : (
+                        positionClients.map((client, index) => (
+                          <tr 
+                            key={client.id} 
+                            onClick={() => navigate(`/tracker/${productId}/client/${client.id}`, { state: { client } })}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            <td className="col-sr">{index + 1}</td>
+                            <td className="col-name">{client.name}</td>
+                            <td className="col-party">{client.party}</td>
+                            <td className="col-events">{client.events ? client.events.length : 0} Interactions</td>
+                            <td>{renderBadge(client.finalStatus)}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                  </div>
+                  {positionClients.length > 0 && (
+                    <div className="table-footer">
+                      <span className="view-all-link">View All {'>'}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             );
           })
         ) : (
-          <div className="glass-panel" style={{ padding: '0' }}>
-            <div className="data-table-responsive">
-              <table className="data-table">
+          <div className="lead-category">
+            <div className="table-card">
+              <div className="table-scroll-wrap">
+              <table className="leads-table">
                 <thead>
                   <tr>
-                    <th>Sr No</th>
-                    {product.schema.map(field => <th key={field.key}>{field.label}</th>)}
-                    <th>Actions</th>
+                    <th className="col-sr">SR NO</th>
+                    {product.schema.map(field => <th key={field.key} className="col-name">{field.label.toUpperCase()}</th>)}
+                    <th>ACTIONS</th>
                   </tr>
                 </thead>
                 <tbody>
                   {clients.length === 0 ? (
                     <tr>
-                      <td colSpan={product.schema.length + 2} style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
-                        No clients tracked for {product.name} yet. Click "Add Client" to get started.
+                      <td colSpan={product.schema.length + 2} style={{ padding: 0 }}>
+                        <div className="empty-state">
+                          <div className="empty-icon-wrap">
+                            <FileText size={24} strokeWidth={1.5} />
+                          </div>
+                          <div className="empty-title">No clients tracked for {product.name} yet.</div>
+                          <div className="empty-subtitle">Click "Add Lead" to get started.</div>
+                        </div>
                       </td>
                     </tr>
                   ) : (
                     clients.map((client, index) => (
                       <tr key={client.id}>
-                        <td style={{ fontWeight: 500, color: 'var(--text-secondary)' }}>{index + 1}</td>
-                        {product.schema.map(field => (
-                          <td key={field.key}>
-                            {renderTableCell(field, client[field.key])}
-                          </td>
-                        ))}
+                        <td className="col-sr">{index + 1}</td>
+                        {product.schema.map(field => {
+                           let val = client[field.key] || '-';
+                           if (field.type === 'datetime-local' && val !== '-') {
+                             val = new Date(val).toLocaleDateString();
+                           }
+                           if (field.key === 'result') {
+                             return <td key={field.key}>{renderBadge(val)}</td>;
+                           }
+                           return <td key={field.key}>{val}</td>;
+                        })}
                         <td>
-                          <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <button className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', display: 'flex', gap: '0.25rem', alignItems: 'center', fontSize: '0.75rem' }} onClick={() => handleEditClient(client)}>
-                              <Edit2 size={14} /> Edit
-                            </button>
-                          </div>
+                          <button className="icon-btn" onClick={() => handleEditClient(client)}>
+                            <Edit2 size={16} />
+                          </button>
                         </td>
                       </tr>
                     ))
                   )}
                 </tbody>
               </table>
+              </div>
             </div>
           </div>
         )}
       </main>
-      </div>
 
       {/* Add Client Modal */}
       {isModalOpen && (
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
           <div className="modal-content animate-fade-in" onClick={e => e.stopPropagation()}>
             <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-              <h2 className="h3">{editingClientId ? 'Edit Client' : 'Add New Client'}</h2>
-              <button className="close-btn" onClick={() => setIsModalOpen(false)}>
+              <h2 className="h3" style={{ margin: 0 }}>{editingClientId ? 'Edit Client' : 'Add New Lead'}</h2>
+              <button className="icon-btn" onClick={() => setIsModalOpen(false)}>
                 <X size={24} />
               </button>
             </div>
             
             <form onSubmit={handleSubmit}>
-              <div className="modal-grid">
+              <div className="modal-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
               {product.schema.map(field => {
                 if (field.type === 'checkbox') {
                   return (
-                    <div key={field.key} className="input-group" style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 0, height: '100%', paddingBottom: '0.875rem' }}>
-                      <label className="checkbox-label">
-                        <input 
-                          type="checkbox" 
-                          checked={formData[field.key] || false}
-                          onChange={e => handleInputChange(field.key, e.target.checked)} 
-                          style={{ width: '1.2rem', height: '1.2rem', accentColor: 'var(--accent-color)' }}
-                        />
-                        <span>{field.label}</span>
-                      </label>
+                    <div key={field.key} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={formData[field.key] || false}
+                        onChange={e => handleInputChange(field.key, e.target.checked)} 
+                        style={{ width: '16px', height: '16px', accentColor: '#800000' }}
+                      />
+                      <label style={{ fontSize: '14px', color: '#334155', fontWeight: 500 }}>{field.label}</label>
                     </div>
                   );
                 }
                 
                 if (field.type === 'select') {
                   const selectStyles = {
-                    control: (base, state) => ({
-                      ...base,
-                      padding: '0.375rem 0.5rem',
-                      borderRadius: 'var(--radius-md)',
-                      borderColor: state.isFocused ? 'var(--accent-color)' : 'var(--border-color)',
-                      borderWidth: '2px',
-                      boxShadow: state.isFocused ? '0 0 0 4px var(--accent-light)' : 'none',
-                      backgroundColor: 'var(--bg-tertiary)',
-                      fontFamily: 'inherit',
-                      fontSize: '1rem',
-                      '&:hover': {
-                        borderColor: state.isFocused ? 'var(--accent-color)' : 'var(--border-color)'
-                      }
-                    }),
-                    menu: (base) => ({
-                      ...base,
-                      backgroundColor: 'var(--bg-secondary)',
-                      borderRadius: 'var(--radius-md)',
-                      boxShadow: 'var(--shadow-lg)',
-                      border: '1px solid var(--border-color)',
-                      zIndex: 100
+                    control: (base) => ({
+                      ...base, padding: '4px', borderRadius: '6px', borderColor: '#e2e8f0', boxShadow: 'none',
+                      '&:hover': { borderColor: '#cbd5e1' }
                     }),
                     option: (base, state) => ({
-                      ...base,
-                      backgroundColor: state.isSelected 
-                        ? 'var(--accent-color)' 
-                        : state.isFocused 
-                          ? 'var(--bg-tertiary)' 
-                          : 'transparent',
-                      color: state.isSelected ? 'white' : 'var(--text-primary)',
-                      cursor: 'pointer',
-                      padding: '0.75rem 1.25rem',
-                      '&:active': {
-                        backgroundColor: 'var(--accent-hover)'
-                      }
-                    }),
-                    singleValue: (base) => ({
-                      ...base,
-                      color: 'var(--text-primary)'
-                    }),
-                    placeholder: (base) => ({
-                      ...base,
-                      color: 'var(--text-tertiary)'
+                      ...base, backgroundColor: state.isSelected ? '#800000' : state.isFocused ? '#f8fafc' : 'transparent',
+                      color: state.isSelected ? 'white' : '#0f172a'
                     })
                   };
 
                   return (
-                    <div key={field.key} className="input-group" style={{ marginBottom: 0 }}>
-                      <label>{field.label} {field.required && '*'}</label>
+                    <div key={field.key}>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#64748b', marginBottom: '6px' }}>{field.label} {field.required && '*'}</label>
                       <Select
                         options={field.options.map(opt => ({ value: opt, label: opt }))}
                         value={formData[field.key] ? { value: formData[field.key], label: formData[field.key] } : null}
                         onChange={(selectedOption) => handleInputChange(field.key, selectedOption ? selectedOption.value : '')}
                         styles={selectStyles}
-                        placeholder={`Select ${field.label.toLowerCase()}...`}
-                        isClearable
-                        menuPlacement="top"
+                        placeholder={`Select...`}
                       />
                     </div>
                   );
@@ -352,49 +310,47 @@ export default function ClientTracker() {
 
                 if (field.type === 'datetime-local') {
                   return (
-                    <div key={field.key} className="input-group" style={{ marginBottom: 0 }}>
-                      <label>{field.label} {field.required && '*'}</label>
+                    <div key={field.key}>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#64748b', marginBottom: '6px' }}>{field.label} {field.required && '*'}</label>
                       <DatePicker
                         selected={formData[field.key] ? new Date(formData[field.key]) : null}
                         onChange={(date) => handleInputChange(field.key, date ? date.toISOString() : '')}
                         showTimeSelect
                         dateFormat="Pp"
-                        className="input-field"
-                        placeholderText={`Select ${field.label.toLowerCase()}...`}
-                        isClearable
+                        customInput={<input style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '14px' }} />}
                       />
                     </div>
                   );
                 }
 
                 return (
-                  <div key={field.key} className="input-group" style={{ marginBottom: 0 }}>
-                    <label>{field.label} {field.required && '*'}</label>
+                  <div key={field.key}>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#64748b', marginBottom: '6px' }}>{field.label} {field.required && '*'}</label>
                     <input 
                       type={field.type} 
-                      className="input-field" 
                       value={formData[field.key] || ''} 
                       onChange={e => handleInputChange(field.key, e.target.value)} 
                       required={field.required} 
                       placeholder={`Enter ${field.label.toLowerCase()}...`}
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '14px', outline: 'none' }}
                     />
                   </div>
                 );
               })}
               </div>
 
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-                <button type="button" className="btn btn-outline" style={{ flex: 1 }} onClick={() => setIsModalOpen(false)}>
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', justifyContent: 'flex-end' }}>
+                <button type="button" onClick={() => setIsModalOpen(false)} style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer', fontWeight: 600, color: '#64748b' }}>
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary" style={{ flex: 1 }} disabled={isSubmitting}>
-                  {isSubmitting ? 'Saving...' : (editingClientId ? 'Save Changes' : 'Add Client')}
+                <button type="submit" disabled={isSubmitting} style={{ padding: '8px 20px', background: '#800000', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 600 }}>
+                  {isSubmitting ? 'Saving...' : (editingClientId ? 'Save Changes' : 'Add Lead')}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

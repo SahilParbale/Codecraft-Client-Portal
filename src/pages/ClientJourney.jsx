@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { PRODUCTS, getClients, updateClient } from '../store/DataStore';
-import { ArrowLeft, Phone, Calendar, FileText, Check, Clock, User, Briefcase, MapPin, Trash2, Edit2 } from 'lucide-react';
+import { 
+  ArrowLeft, Check, Lock, Building2, MapPin, Calendar, 
+  FileText, Phone, Bold, Italic, List, Link, Trash2, Edit2 
+} from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import './ClientJourney.css';
 
-// Pipeline Stages for the Chevron Bar
 const PIPELINE_STAGES = [
   'Pending',
   'Contacted',
@@ -34,14 +37,11 @@ export default function ClientJourney() {
   const [client, setClient] = useState(getInitialClient());
   const [loading, setLoading] = useState(!location.state?.client);
 
-  // Form State - Tabbed "Log Activity" Box
-  const [activeTab, setActiveTab] = useState('NOTE'); // NOTE, CALL, DEMO
-  const [formData, setFormData] = useState({ date: new Date().toISOString(), outcome: '', details: '' });
+  const [activeTab, setActiveTab] = useState('NOTE');
+  const [formData, setFormData] = useState({ date: new Date().toISOString(), details: '' });
 
-  // Event Edit State
   const [editingEventId, setEditingEventId] = useState(null);
   const [editingContent, setEditingContent] = useState('');
-  const [eventToDelete, setEventToDelete] = useState(null);
 
   useEffect(() => {
     if (!product) {
@@ -61,8 +61,6 @@ export default function ClientJourney() {
     }
     if (!found.events) found.events = [];
     if (!found.finalStatus) found.finalStatus = 'Pending';
-    
-    // Auto-map legacy statuses to pipeline if needed
     if (found.finalStatus === 'Closed Won' || found.finalStatus === 'Closed Lost') found.finalStatus = 'Closed';
     if (found.finalStatus === 'Follow-up') found.finalStatus = 'Contacted';
     
@@ -74,41 +72,27 @@ export default function ClientJourney() {
     e.preventDefault();
     if (!formData.details) return;
 
-    // Determine outcome based on tab if not provided
-    let finalOutcome = formData.outcome;
-    if (!finalOutcome) {
-      if (activeTab === 'CALL') finalOutcome = 'Call Logged';
-      if (activeTab === 'DEMO') finalOutcome = 'Demo Logged';
-      if (activeTab === 'NOTE') finalOutcome = 'Note Added';
-    }
-
     const eventDate = activeTab === 'DEMO' ? formData.date : new Date().toISOString();
-
     const newEvent = { 
       id: Date.now(),
       type: activeTab, 
       date: eventDate, 
-      outcome: finalOutcome,
       details: formData.details 
     };
 
-    const updatedEvents = [newEvent, ...client.events]; // Prepend so newest is top
+    const updatedEvents = [newEvent, ...client.events];
     const updatedClient = await updateClient(productId, client.id, { ...client, events: updatedEvents });
     
     if (updatedClient) {
       setClient({ ...updatedClient, events: updatedEvents });
-      setFormData({ date: new Date().toISOString(), outcome: '', details: '' });
+      setFormData({ date: new Date().toISOString(), details: '' });
     }
   };
 
-  const confirmDeleteEvent = async () => {
-    if (!eventToDelete) return;
-    const updatedEvents = client.events.filter(e => e.id !== eventToDelete);
+  const handleDeleteEvent = async (eventId) => {
+    const updatedEvents = client.events.filter(e => e.id !== eventId);
     const updatedClient = await updateClient(productId, client.id, { ...client, events: updatedEvents });
-    if (updatedClient) {
-      setClient({ ...updatedClient, events: updatedEvents });
-      setEventToDelete(null);
-    }
+    if (updatedClient) setClient({ ...updatedClient, events: updatedEvents });
   };
 
   const handleEditEventSubmit = async (eventId) => {
@@ -123,16 +107,16 @@ export default function ClientJourney() {
 
   const handleStageClick = async (stage) => {
     const updatedClient = await updateClient(productId, client.id, { ...client, finalStatus: stage });
-    if (updatedClient) {
-      setClient({ ...updatedClient, finalStatus: stage });
-    }
+    if (updatedClient) setClient({ ...updatedClient, finalStatus: stage });
   };
 
   if (loading || !client) return <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>Loading client record...</div>;
 
-  // Chevron Pipeline Logic
   const currentStageIndex = PIPELINE_STAGES.indexOf(client.finalStatus);
   const activeIndex = currentStageIndex === -1 ? 0 : currentStageIndex;
+  
+  // Calculate width for the progress fill line
+  const progressFillWidth = `${(activeIndex / (PIPELINE_STAGES.length - 1)) * 100}%`;
 
   const getEventIcon = (type) => {
     if (type === 'CALL') return <Phone size={14} />;
@@ -141,227 +125,219 @@ export default function ClientJourney() {
   };
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#f8fafc', fontFamily: 'Inter, system-ui, sans-serif', color: '#1e293b', overflow: 'hidden' }}>
+    <div className="journey-body animate-fade-in">
       
-      {/* Top Navbar */}
-      <header style={{ flexShrink: 0, background: '#ffffff', borderBottom: '1px solid #e2e8f0', padding: '0.75rem 2rem', zIndex: 50 }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <button onClick={() => navigate(`/tracker/${productId}`)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
-            <ArrowLeft size={16} /> Back to {product.name} Leads
-          </button>
-        </div>
+      <header className="journey-header">
+        <button className="btn-back" onClick={() => navigate(`/tracker/${productId}`)}>
+          <ArrowLeft size={16} strokeWidth={2.5} /> Back to Leads
+        </button>
       </header>
 
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', maxWidth: '1200px', margin: '0 auto', width: '100%', padding: '2rem', overflow: 'hidden' }}>
+      <main className="journey-container">
         
-        <div style={{ flexShrink: 0 }}>
-          {/* Header Section */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
-          <div>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 600, color: '#0f172a', margin: '0 0 0.5rem 0' }}>{client.name}</h1>
-            <div style={{ fontSize: '0.875rem', color: '#64748b', display: 'flex', gap: '1rem' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Briefcase size={14}/> {client.position}</span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><MapPin size={14}/> {client.party}</span>
+        {/* Title Section */}
+        <div className="journey-title-section">
+          <div className="journey-name-wrap">
+            <h1 className="journey-name">{client.name}</h1>
+            <div className="journey-badge">
+              <Check size={14} strokeWidth={3} /> {client.finalStatus.toUpperCase()}
             </div>
+          </div>
+          <div className="journey-subtitle">
+            <div className="subtitle-item"><Building2 size={14}/> {client.position}</div>
+            <div className="subtitle-item"><MapPin size={14}/> {client.party}</div>
           </div>
         </div>
 
-        {/* Pipeline Chevron Bar (Salesforce Style) */}
-        <div style={{ display: 'flex', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '6px', overflow: 'hidden', marginBottom: '2rem' }}>
+        {/* Timeline Progress */}
+        <div className="progress-container">
+          <div className="progress-line">
+            <div className="progress-line-fill" style={{ width: progressFillWidth }}></div>
+          </div>
+          
           {PIPELINE_STAGES.map((stage, idx) => {
             const isCompleted = idx < activeIndex;
             const isActive = idx === activeIndex;
-            let bgColor = '#ffffff';
-            let textColor = '#64748b';
+            const isLast = idx === PIPELINE_STAGES.length - 1;
             
-            if (isActive) { bgColor = '#fdf5f5'; textColor = '#800000'; }
-            else if (isCompleted) { bgColor = '#f8fafc'; textColor = '#10b981'; }
+            let circleClass = "step-circle";
+            if (isCompleted) circleClass += " completed";
+            else if (isActive && !isLast) circleClass += " active";
+            else if (isLast && isActive) circleClass += " closed";
+            else if (isLast && isCompleted) circleClass += " closed"; // If somehow past closed
+
+            let labelClass = "step-label";
+            if (isActive && !isLast) labelClass += " active";
+            else if (isLast && (isActive || isCompleted)) labelClass += " closed";
 
             return (
-              <div 
-                key={stage}
-                onClick={() => handleStageClick(stage)}
-                style={{
-                  flex: 1, padding: '0.75rem', textAlign: 'center', fontSize: '0.875rem', fontWeight: isActive ? 600 : 500,
-                  background: bgColor, color: textColor, borderRight: idx < PIPELINE_STAGES.length - 1 ? '1px solid #e2e8f0' : 'none',
-                  cursor: 'pointer', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem',
-                  transition: 'background 0.2s'
-                }}
-                onMouseOver={(e) => { if(!isActive) e.currentTarget.style.background = '#f1f5f9' }}
-                onMouseOut={(e) => { if(!isActive) e.currentTarget.style.background = bgColor }}
-              >
-                {isCompleted && <Check size={14} />}
-                {stage}
+              <div key={stage} className="progress-step" onClick={() => handleStageClick(stage)}>
+                <div className={circleClass}>
+                  {isCompleted && !isLast && <Check size={16} strokeWidth={3} />}
+                  {isLast && (isActive || isCompleted) && <Lock size={14} strokeWidth={2.5} />}
+                  {isLast && !isActive && !isCompleted && <Lock size={14} strokeWidth={2.5} color="#cbd5e1" />}
+                </div>
+                <div className={labelClass}>{stage}</div>
               </div>
             );
           })}
         </div>
-        </div>
 
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '300px 1fr', gap: '2rem', minHeight: 0 }}>
+        <div className="journey-grid">
           
-          {/* Left Column: Client Details */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', overflowY: 'auto', paddingRight: '0.5rem', paddingBottom: '2rem' }}>
-            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '1.5rem' }}>
-              <h3 style={{ fontSize: '0.875rem', fontWeight: 600, textTransform: 'uppercase', color: '#64748b', letterSpacing: '0.05em', marginBottom: '1.5rem' }}>About this Lead</h3>
+          {/* Left Column */}
+          <div>
+            <div className="info-card">
+              <div className="info-card-header">
+                <FileText size={16} className="text-muted" /> Lead Information
+              </div>
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div>
-                  <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '0.25rem' }}>Full Name</div>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 500, color: '#0f172a' }}>{client.name}</div>
+              <div className="info-field">
+                <div className="info-label">Full Name</div>
+                <div className="info-val">{client.name}</div>
+              </div>
+              
+              <div className="info-field">
+                <div className="info-label">Political Party</div>
+                <div className="info-val">{client.party}</div>
+              </div>
+
+              <div className="info-field" style={{ marginBottom: 0 }}>
+                <div className="info-label">Position / Title</div>
+                <div className="info-val">{client.position}</div>
+              </div>
+
+              <div className="info-divider"></div>
+
+              <div className="info-bottom">
+                <div className="info-bottom-item">
+                  <Calendar size={14} color="#94a3b8" />
+                  <span>Created On <br/> <strong style={{color: '#0f172a'}}>{new Date(client.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</strong></span>
                 </div>
-                <div>
-                  <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '0.25rem' }}>Political Party</div>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 500, color: '#0f172a' }}>{client.party}</div>
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '0.25rem' }}>Position / Title</div>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 500, color: '#0f172a' }}>{client.position}</div>
-                </div>
-                <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '1rem', marginTop: '0.5rem' }}>
-                  <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '0.25rem' }}>Creation Date</div>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 500, color: '#0f172a' }}>{new Date(client.createdAt).toLocaleDateString()}</div>
+                
+                <div className="info-bottom-item" style={{ marginTop: '8px' }}>
+                  <div className="avatar" style={{ width: '24px', height: '24px', fontSize: '10px' }}>K</div>
+                  <span style={{ fontSize: '12px', color: '#64748b' }}>Lead Owner <span style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: '10px', marginLeft: '6px' }}>+2</span></span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Activity Logger & Feed */}
-          <div style={{ overflowY: 'auto', paddingRight: '0.5rem', paddingBottom: '2rem' }}>
+          {/* Right Column */}
+          <div>
             
-            {/* Activity Logger (HubSpot Style) */}
-            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden', marginBottom: '2rem' }}>
-              {/* Tabs */}
-              <div style={{ display: 'flex', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                <button onClick={() => setActiveTab('NOTE')} style={{ flex: 1, padding: '0.75rem', background: activeTab === 'NOTE' ? '#ffffff' : 'transparent', border: 'none', borderBottom: activeTab === 'NOTE' ? '2px solid #800000' : '2px solid transparent', color: activeTab === 'NOTE' ? '#800000' : '#64748b', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
+            {/* Logger Box */}
+            <div className="logger-card">
+              <div className="logger-tabs">
+                <button className={`logger-tab ${activeTab === 'NOTE' ? 'active' : ''}`} onClick={() => setActiveTab('NOTE')}>
                   <FileText size={16} /> Note
                 </button>
-                <button onClick={() => setActiveTab('CALL')} style={{ flex: 1, padding: '0.75rem', background: activeTab === 'CALL' ? '#ffffff' : 'transparent', border: 'none', borderBottom: activeTab === 'CALL' ? '2px solid #800000' : '2px solid transparent', color: activeTab === 'CALL' ? '#800000' : '#64748b', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
+                <button className={`logger-tab ${activeTab === 'CALL' ? 'active' : ''}`} onClick={() => setActiveTab('CALL')}>
                   <Phone size={16} /> Call
                 </button>
-                <button onClick={() => setActiveTab('DEMO')} style={{ flex: 1, padding: '0.75rem', background: activeTab === 'DEMO' ? '#ffffff' : 'transparent', border: 'none', borderBottom: activeTab === 'DEMO' ? '2px solid #800000' : '2px solid transparent', color: activeTab === 'DEMO' ? '#800000' : '#64748b', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
+                <button className={`logger-tab ${activeTab === 'DEMO' ? 'active' : ''}`} onClick={() => setActiveTab('DEMO')}>
                   <Calendar size={16} /> Demo
                 </button>
               </div>
 
-              {/* Form Area */}
-              <div style={{ padding: '1.5rem' }}>
+              <div className="logger-body">
                 <form onSubmit={handleSaveActivity}>
                   
-                  {activeTab !== 'NOTE' && (
-                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', marginBottom: '0.25rem' }}>Outcome / Result</label>
-                        <input type="text" placeholder={activeTab === 'CALL' ? 'e.g. Connected, Left Voicemail' : 'e.g. Completed, Rescheduled'} value={formData.outcome} onChange={e => setFormData({...formData, outcome: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '0.875rem' }} />
-                      </div>
-                      {activeTab === 'DEMO' && (
-                        <div style={{ width: '200px' }}>
-                          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', marginBottom: '0.25rem' }}>Date & Time</label>
-                          <DatePicker 
-                            selected={formData.date ? new Date(formData.date) : new Date()}
-                            onChange={date => setFormData({...formData, date: date ? date.toISOString() : ''})}
-                            showTimeSelect
-                            dateFormat="Pp"
-                            customInput={<input style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '0.875rem' }} />}
-                            required
-                          />
-                        </div>
-                      )}
+                  {activeTab === 'DEMO' && (
+                    <div style={{ marginBottom: '16px' }}>
+                      <DatePicker 
+                        selected={formData.date ? new Date(formData.date) : new Date()}
+                        onChange={date => setFormData({...formData, date: date ? date.toISOString() : ''})}
+                        showTimeSelect
+                        dateFormat="Pp"
+                        customInput={<input style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '14px' }} />}
+                        required
+                      />
                     </div>
                   )}
 
-                  <textarea 
-                    placeholder={`Start typing your ${activeTab.toLowerCase()} notes here...`}
-                    value={formData.details}
-                    onChange={e => setFormData({...formData, details: e.target.value})}
-                    style={{ width: '100%', minHeight: '100px', padding: '0.75rem', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '0.875rem', resize: 'vertical', fontFamily: 'inherit' }}
-                    required
-                  ></textarea>
+                  <div className="logger-input-wrap">
+                    <textarea 
+                      placeholder="Add a note..."
+                      value={formData.details}
+                      onChange={e => setFormData({...formData, details: e.target.value})}
+                      required
+                    ></textarea>
+                    
+                    <div className="logger-toolbar">
+                      <button type="button"><Bold size={14} strokeWidth={2.5} /></button>
+                      <button type="button"><Italic size={14} strokeWidth={2.5} /></button>
+                      <button type="button"><List size={14} strokeWidth={2.5} /></button>
+                      <button type="button"><Link size={14} strokeWidth={2.5} /></button>
+                    </div>
+                  </div>
                   
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                    <button type="submit" style={{ background: '#800000', color: 'white', border: 'none', padding: '0.5rem 1.25rem', borderRadius: '4px', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer' }}>
-                      Log {activeTab.charAt(0) + activeTab.slice(1).toLowerCase()}
-                    </button>
+                  <div style={{ overflow: 'hidden' }}>
+                    <button type="submit" className="btn-log">Log {activeTab.charAt(0) + activeTab.slice(1).toLowerCase()}</button>
                   </div>
                 </form>
               </div>
             </div>
 
-            {/* Timeline Feed */}
-            <div>
-              <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#0f172a', marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}>Recent Activity</h3>
+            {/* Recent Activity */}
+            <div className="feed-card">
+              <h3 className="feed-header">Recent Activity</h3>
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div className="feed-list">
                 {client.events.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '3rem', color: '#94a3b8', background: '#ffffff', borderRadius: '8px', border: '1px dashed #cbd5e1' }}>
-                    No activity logged yet. Use the box above to add a note or call.
+                  <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8', fontSize: '14px' }}>
+                    No activity logged yet.
                   </div>
                 ) : (
-                  client.events.map((evt) => (
-                    <div key={evt.id} style={{ display: 'flex', gap: '1rem', background: '#ffffff', padding: '1.25rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <div style={{ width: '2rem', height: '2rem', borderRadius: '50%', background: '#f1f5f9', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        {getEventIcon(evt.type)}
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                          <div>
-                            <span style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.875rem', marginRight: '0.5rem' }}>{evt.type === 'NOTE' ? 'Note Added' : `${evt.type.charAt(0) + evt.type.slice(1).toLowerCase()} Logged`}</span>
-                            {evt.outcome && <span style={{ fontSize: '0.75rem', color: '#64748b', background: '#f1f5f9', padding: '0.15rem 0.5rem', borderRadius: '12px' }}>{evt.outcome}</span>}
-                          </div>
-                          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                            <div style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                              <Clock size={12} /> {new Date(evt.date).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
-                            </div>
-                            <button onClick={() => { setEditingEventId(evt.id); setEditingContent(evt.details); }} style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: 0 }} title="Edit">
-                              <Edit2 size={14} />
-                            </button>
-                            <button onClick={() => setEventToDelete(evt.id)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: 0 }} title="Delete">
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
+                  client.events.map((evt) => {
+                    return (
+                      <div key={evt.id} className="feed-item">
+                        <div className="feed-icon">
+                          {getEventIcon(evt.type)}
                         </div>
-                        {editingEventId === evt.id ? (
-                          <div style={{ marginTop: '0.5rem' }}>
-                            <textarea 
-                              value={editingContent}
-                              onChange={(e) => setEditingContent(e.target.value)}
-                              style={{ width: '100%', minHeight: '80px', padding: '0.5rem', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '0.875rem', resize: 'vertical', fontFamily: 'inherit', marginBottom: '0.5rem' }}
-                            />
-                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                              <button onClick={() => setEditingEventId(null)} style={{ background: 'transparent', border: '1px solid #cbd5e1', padding: '0.25rem 0.75rem', borderRadius: '4px', fontSize: '0.75rem', cursor: 'pointer' }}>Cancel</button>
-                              <button onClick={() => handleEditEventSubmit(evt.id)} style={{ background: '#800000', color: 'white', border: 'none', padding: '0.25rem 0.75rem', borderRadius: '4px', fontSize: '0.75rem', cursor: 'pointer' }}>Save</button>
+                        
+                        <div className="feed-content">
+                          <div className="feed-top">
+                            <div className="feed-title">
+                              {evt.type === 'NOTE' ? 'Note Added' : `${evt.type.charAt(0) + evt.type.slice(1).toLowerCase()} Logged`}
+                              <span className="feed-badge">{evt.type.charAt(0) + evt.type.slice(1).toLowerCase()}</span>
+                            </div>
+                            <div className="feed-meta">
+                              {new Date(evt.date).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                              <div className="feed-actions">
+                                <button onClick={() => { setEditingEventId(evt.id); setEditingContent(evt.details); }}><Edit2 size={14}/></button>
+                                <button onClick={() => handleDeleteEvent(evt.id)}><Trash2 size={14}/></button>
+                              </div>
                             </div>
                           </div>
-                        ) : (
-                          <div style={{ fontSize: '0.875rem', color: '#334155', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>
-                            {evt.details}
-                          </div>
-                        )}
+                          
+                          {editingEventId === evt.id ? (
+                            <div style={{ marginTop: '8px' }}>
+                              <textarea 
+                                value={editingContent}
+                                onChange={(e) => setEditingContent(e.target.value)}
+                                style={{ width: '100%', minHeight: '80px', padding: '10px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '13px', resize: 'vertical', fontFamily: 'inherit', marginBottom: '8px' }}
+                              />
+                              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                                <button onClick={() => setEditingEventId(null)} style={{ background: 'transparent', border: '1px solid #cbd5e1', padding: '4px 12px', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}>Cancel</button>
+                                <button onClick={() => handleEditEventSubmit(evt.id)} style={{ background: '#800000', color: 'white', border: 'none', padding: '4px 12px', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}>Save</button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="feed-text">{evt.details}</div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
             </div>
 
           </div>
         </div>
+
       </main>
-
-      {/* Delete Confirmation Modal */}
-      {eventToDelete && (
-        <div className="modal-overlay" onClick={() => setEventToDelete(null)}>
-          <div className="modal-content animate-fade-in" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
-            <h3 className="h3" style={{ marginBottom: '1rem' }}>Confirm Deletion</h3>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>Are you sure you want to delete this activity? This action cannot be undone.</p>
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-              <button onClick={() => setEventToDelete(null)} className="btn btn-outline">Cancel</button>
-              <button onClick={confirmDeleteEvent} className="btn btn-primary">Delete Activity</button>
-            </div>
-          </div>
-        </div>
-      )}
-
     </div>
   );
 }

@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PRODUCTS, logout } from '../store/DataStore';
+import { PRODUCTS, logout, getTotalClientsCount } from '../store/DataStore';
 import { 
   LogOut, 
   ChevronRight, 
   LayoutGrid, 
   Users, 
-  TrendingUp, 
   Building2, 
   Vote, 
   Share2, 
@@ -30,24 +29,19 @@ const getProductIcon = (name) => {
 
 export default function ProductSelect() {
   const navigate = useNavigate();
-  const [scale, setScale] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [activeClients, setActiveClients] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const handleResize = () => {
-      // Header is approx 70px.
-      // Content needs about 850px.
-      const availableHeight = window.innerHeight - 70;
-      if (availableHeight < 850) {
-        setScale(availableHeight / 850);
-      } else {
-        setScale(1);
-      }
+    const fetchStats = async () => {
+      setTotalProducts(PRODUCTS.length);
+      const clients = await getTotalClientsCount();
+      setActiveClients(clients);
+      setIsLoading(false);
     };
     
-    window.addEventListener('resize', handleResize);
-    handleResize();
-    
-    return () => window.removeEventListener('resize', handleResize);
+    fetchStats();
   }, []);
 
   const handleLogout = () => {
@@ -102,14 +96,7 @@ export default function ProductSelect() {
       </header>
 
       {/* Main Content */}
-      <main 
-        className="dashboard-container" 
-        style={{ 
-          transform: `scale(${scale})`, 
-          transformOrigin: 'top left',
-          width: `${(1 / scale) * 100}%`
-        }}
-      >
+      <main className="dashboard-container">
         
         <div className="dash-hero">
           <div className="hero-text animate-fade-in">
@@ -124,7 +111,7 @@ export default function ProductSelect() {
                 <LayoutGrid size={22} strokeWidth={2.5} />
               </div>
               <div className="stat-content">
-                <span className="stat-value">5</span>
+                <span className="stat-value">{isLoading ? '...' : totalProducts}</span>
                 <span className="stat-label">Total Products</span>
               </div>
             </div>
@@ -135,19 +122,8 @@ export default function ProductSelect() {
                 <Users size={22} strokeWidth={2.5} />
               </div>
               <div className="stat-content">
-                <span className="stat-value">128</span>
+                <span className="stat-value">{isLoading ? '...' : activeClients}</span>
                 <span className="stat-label">Active Clients</span>
-              </div>
-            </div>
-            <div className="stat-divider"></div>
-
-            <div className="stat-item">
-              <div className="stat-icon">
-                <TrendingUp size={22} strokeWidth={2.5} />
-              </div>
-              <div className="stat-content">
-                <span className="stat-value">98%</span>
-                <span className="stat-label">System Uptime</span>
               </div>
             </div>
           </div>

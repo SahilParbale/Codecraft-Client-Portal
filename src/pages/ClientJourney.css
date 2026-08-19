@@ -1,0 +1,430 @@
+.journey-body {
+    background-color: #fafafb;
+    min-height: 100vh;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    color: #0f172a;
+}
+
+/* Header */
+.journey-header {
+    padding: 20px 40px;
+    background-color: transparent;
+}
+
+.btn-back {
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.btn-back:hover {
+    color: #0f172a;
+}
+
+/* Main Container */
+.journey-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px 40px 60px;
+}
+
+/* Title Section */
+.journey-title-section {
+    margin-bottom: 30px;
+}
+
+.journey-name-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.journey-name {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.journey-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    background-color: #fdf2f2;
+    color: #800000;
+}
+
+.journey-subtitle {
+    display: flex;
+    gap: 20px;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.subtitle-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Timeline / Progress Bar */
+.progress-container {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 40px;
+    padding: 0 20px;
+}
+
+.progress-line {
+    position: absolute;
+    top: 15px;
+    left: 40px;
+    right: 40px;
+    height: 2px;
+    background-color: #e2e8f0;
+    z-index: 1;
+}
+
+.progress-line-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #800000;
+    transition: width 0.3s ease;
+}
+
+.progress-step {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100px;
+    cursor: pointer;
+}
+
+.step-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    border: 2px solid #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.step-circle.completed {
+    border-color: #800000;
+    color: #800000;
+}
+
+.step-circle.active {
+    border-color: #800000;
+    color: #800000;
+    box-shadow: 0 0 0 4px rgba(128,0,0,0.1);
+}
+
+.step-circle.closed {
+    background-color: #800000;
+    border-color: #800000;
+    color: white;
+}
+
+.step-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748b;
+    text-align: center;
+}
+
+.step-label.active {
+    color: #0f172a;
+    font-weight: 600;
+}
+
+.step-label.closed {
+    color: #800000;
+    font-weight: 700;
+}
+
+/* 2-Column Layout */
+.journey-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+}
+
+/* Info Card */
+.info-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 24px;
+}
+
+.info-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 24px;
+}
+
+.info-field {
+    margin-bottom: 20px;
+}
+
+.info-label {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 6px;
+}
+
+.info-val {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.info-divider {
+    height: 1px;
+    background-color: #e2e8f0;
+    margin: 24px 0;
+}
+
+.info-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.info-bottom-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: #334155;
+    font-weight: 500;
+}
+
+/* Logger Card */
+.logger-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.logger-tabs {
+    display: flex;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.logger-tab {
+    flex: 1;
+    padding: 16px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.logger-tab.active {
+    border-bottom-color: #800000;
+    color: #800000;
+    background-color: #fcfdfd;
+}
+
+.logger-body {
+    padding: 20px;
+}
+
+.logger-input-wrap {
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.logger-input-wrap textarea {
+    width: 100%;
+    border: none;
+    padding: 16px;
+    font-size: 14px;
+    min-height: 120px;
+    resize: vertical;
+    outline: none;
+    font-family: inherit;
+    color: #334155;
+}
+
+.logger-toolbar {
+    display: flex;
+    gap: 12px;
+    padding: 10px 16px;
+    border-top: 1px solid #e2e8f0;
+    background-color: #f8fafc;
+    color: #64748b;
+}
+
+.logger-toolbar button {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logger-toolbar button:hover {
+    color: #0f172a;
+}
+
+.btn-log {
+    background-color: #800000;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    float: right;
+    box-shadow: 0 2px 4px rgba(128,0,0,0.2);
+}
+
+.btn-log:hover {
+    background-color: #600000;
+}
+
+/* Activity Feed */
+.feed-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.feed-header {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 20px;
+}
+
+.feed-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.feed-item {
+    display: flex;
+    gap: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.feed-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.feed-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background-color: #fdf2f2;
+    color: #800000;
+}
+
+.feed-content {
+    flex: 1;
+}
+
+.feed-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.feed-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.feed-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background-color: #f1f5f9;
+    color: #64748b;
+}
+
+.feed-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.feed-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.feed-actions button {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+}
+
+.feed-actions button:hover {
+    color: #ef4444;
+}
+
+.feed-text {
+    font-size: 14px;
+    color: #475569;
+    line-height: 1.5;
+}
