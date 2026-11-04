@@ -78,6 +78,7 @@ export default function Login() {
 
           {/* Logo */}
           <div className="brand">
+            <img src="/favicon.svg" alt="Codecraft CRM" className="brand-logo-img" />
             <div className="brand-text">
               <div className="brand-name">
                 {t('login.brand_name')}

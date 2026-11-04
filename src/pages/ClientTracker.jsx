@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { getClients, addClient, updateClient, findProductById } from '../store/DataStore';
 import PWAInstallButton from '../components/PWAInstallButton';
 import { 
-  X, Edit2, Plus, Code, FileText, Building2, Download, ArrowLeft
+  X, Edit2, Plus, FileText, Building2, Download, ArrowLeft
 } from 'lucide-react';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
@@ -259,7 +259,7 @@ export default function ClientTracker() {
 
           <div className="tracker-brand" style={{ cursor: 'pointer' }} onClick={() => navigate('/products')}>
             <div className="tracker-logo">
-              <Code size={20} strokeWidth={2.5} />
+              <img src="/favicon.svg" alt="Codecraft App" className="tracker-app-icon" />
             </div>
             <div className="brand-text-container">
               <span className="tracker-title">{t(`products.${product.id}.name`)}</span>

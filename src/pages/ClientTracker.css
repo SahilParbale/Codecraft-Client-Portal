@@ -67,12 +67,19 @@
 .tracker-logo {
     width: 36px;
     height: 36px;
-    background-color: #fdf2f2;
-    color: #800000;
+    background-color: transparent;
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+}
+
+.tracker-app-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(128, 0, 0, 0.25);
     flex-shrink: 0;
 }
 

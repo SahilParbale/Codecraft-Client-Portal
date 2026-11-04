@@ -23,7 +23,7 @@ export default function PWAInstallButton({ variant = 'default' }) {
     return (
       <div className={`pwa-desktop-badge ${variant}`}>
         <span className="pwa-badge-icon">
-          <Monitor size={14} />
+          <img src="/favicon.svg" alt="" style={{ width: 15, height: 15, borderRadius: 3 }} />
         </span>
         <span className="pwa-badge-text">PC App</span>
         <span className={`pwa-status-dot ${isOnline ? 'online' : 'offline'}`} title={isOnline ? 'Online' : 'Offline'} />
@@ -51,7 +51,7 @@ export default function PWAInstallButton({ variant = 'default' }) {
             <div className="pwa-guide-header">
               <div className="pwa-guide-title-wrap">
                 <div className="pwa-guide-icon">
-                  <Monitor size={22} />
+                  <img src="/icon-192x192.png" alt="App Icon" style={{ width: 34, height: 34, borderRadius: 8, boxShadow: '0 4px 10px rgba(0,0,0,0.2)' }} />
                 </div>
                 <div>
                   <h3 className="pwa-guide-title">Install PC Desktop App</h3>

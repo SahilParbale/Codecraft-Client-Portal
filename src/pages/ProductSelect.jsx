@@ -78,6 +78,7 @@ export default function ProductSelect() {
       {/* Header */}
       <header className="modern-header">
         <div className="logo-container">
+          <img src="/favicon.svg" alt="Codecraft App Icon" className="app-header-icon" />
           <div className="brand-text">
             <span className="brand-name">{t('login.brand_name')}</span>
             <span className="brand-sub">{t('login.brand_sub')}</span>

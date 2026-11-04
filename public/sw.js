@@ -1,5 +1,5 @@
 // Codecraft Client Manager - Service Worker
-const CACHE_NAME = 'codecraft-pwa-v2';
+const CACHE_NAME = 'codecraft-pwa-v3';
 const OFFLINE_URL = '/offline.html';
 
 const PRECACHE_ASSETS = [
@@ -7,9 +7,14 @@ const PRECACHE_ASSETS = [
   '/index.html',
   '/offline.html',
   '/manifest.webmanifest',
+  '/manifest.json',
+  '/favicon.ico',
   '/favicon.svg',
-  '/icon-192x192.png',
   '/icon-512x512.png',
+  '/icon-192x192.png',
+  '/icon-144x144.png',
+  '/icon-96x96.png',
+  '/icon-48x48.png',
   '/icon-maskable-512x512.png',
   '/apple-touch-icon.png'
 ];
