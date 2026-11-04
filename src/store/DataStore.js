@@ -1,8 +1,9 @@
 // src/store/DataStore.js
 import { supabase } from '../supabaseClient';
 
-const PRODUCTS_KEY = 'codecraft_products';
 const AUTH_KEY = 'codecraft_auth';
+const CACHE_PREFIX = 'codecraft_cached_clients_';
+const TOTAL_CLIENTS_CACHE_KEY = 'codecraft_total_clients_count';
 
 const krishnanitiSchema = [
   { key: 'name', label: 'Name', type: 'text', required: true },
@@ -42,85 +43,218 @@ export const PRODUCTS = [
   { id: 'prod-2', name: 'Builder AI', description: 'Builder line project which gives 3d walkthrough then vr ar', schema: builderSchema, isJourney: false },
 ];
 
-export const getClients = async (productId) => {
-  const { data, error } = await supabase
-    .from('clients')
-    .select('*')
-    .eq('product_id', productId)
-    .order('created_at', { ascending: true });
+// Helper to resolve product from ID, partial ID, or slug
+export const findProductById = (id) => {
+  if (!id) return null;
+  const strId = String(id).trim().toLowerCase();
+  return PRODUCTS.find(p => 
+    p.id.toLowerCase() === strId || 
+    p.id.toLowerCase() === `prod-${strId}` ||
+    strId === p.id.replace('prod-', '') ||
+    p.name.toLowerCase().includes(strId)
+  ) || null;
+};
 
-  if (error) {
-    console.error('Error fetching clients:', error);
-    return [];
+export const getClients = async (productId) => {
+  try {
+    const { data, error } = await supabase
+      .from('clients')
+      .select('*')
+      .eq('product_id', productId)
+      .order('created_at', { ascending: true });
+
+    if (!error && data) {
+      const formatted = data.map(row => ({
+        id: row.id,
+        ...row.client_data,
+        createdAt: row.created_at
+      }));
+      // Cache in localStorage for offline PWA support
+      try {
+        localStorage.setItem(CACHE_PREFIX + productId, JSON.stringify(formatted));
+      } catch (e) {
+        console.warn('Could not cache clients locally:', e);
+      }
+      return formatted;
+    }
+  } catch (err) {
+    console.warn('Network issue fetching clients, falling back to local cache:', err);
   }
 
-  return data.map(row => ({
-    id: row.id,
-    ...row.client_data,
-    createdAt: row.created_at
-  }));
+  // Fallback to offline cache
+  try {
+    const cached = localStorage.getItem(CACHE_PREFIX + productId);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+  } catch (e) {
+    console.error('Error reading offline cache:', e);
+  }
+
+  return [];
 };
 
 export const getTotalClientsCount = async () => {
-  const { count, error } = await supabase
-    .from('clients')
-    .select('*', { count: 'exact', head: true });
-    
-  if (error) {
-    console.error('Error fetching total clients count:', error);
-    return 0;
+  try {
+    const { count, error } = await supabase
+      .from('clients')
+      .select('*', { count: 'exact', head: true });
+      
+    if (!error && count !== null) {
+      localStorage.setItem(TOTAL_CLIENTS_CACHE_KEY, String(count));
+      return count;
+    }
+  } catch (err) {
+    console.warn('Network issue fetching total clients count, checking cache:', err);
   }
-  
-  return count || 0;
+
+  // Fallback to cache
+  const cached = localStorage.getItem(TOTAL_CLIENTS_CACHE_KEY);
+  if (cached) return parseInt(cached, 10);
+
+  // Or calculate from cached product lists
+  let total = 0;
+  PRODUCTS.forEach(p => {
+    try {
+      const data = localStorage.getItem(CACHE_PREFIX + p.id);
+      if (data) total += JSON.parse(data).length;
+    } catch (e) {}
+  });
+
+  return total;
 };
 
-export const addClient = async (productId, clientData) => {
-  const { data, error } = await supabase
-    .from('clients')
-    .insert([{ product_id: productId, client_data: clientData }])
-    .select();
+export const addClient = async (productIdOrClient, maybeClientData) => {
+  let prodId = productIdOrClient;
+  let clientData = maybeClientData;
 
-  if (error) {
-    console.error('Error adding client:', error);
-    alert('Supabase Error: ' + error.message + '\nDetails: ' + error.details);
-    return null;
+  // Handle call as addClient(clientObj) where clientObj has .productId
+  if (typeof productIdOrClient === 'object' && productIdOrClient !== null) {
+    prodId = productIdOrClient.productId;
+    clientData = productIdOrClient;
   }
 
-  return {
-    id: data[0].id,
-    ...data[0].client_data,
-    createdAt: data[0].created_at
-  };
+  try {
+    const { data, error } = await supabase
+      .from('clients')
+      .insert([{ product_id: prodId, client_data: clientData }])
+      .select();
+
+    if (!error && data && data.length > 0) {
+      const newRecord = {
+        id: data[0].id,
+        ...data[0].client_data,
+        createdAt: data[0].created_at
+      };
+
+      // Update offline cache
+      try {
+        const cached = JSON.parse(localStorage.getItem(CACHE_PREFIX + prodId) || '[]');
+        cached.push(newRecord);
+        localStorage.setItem(CACHE_PREFIX + prodId, JSON.stringify(cached));
+      } catch (e) {}
+
+      return newRecord;
+    }
+
+    if (error) {
+      console.error('Error adding client:', error);
+      alert('Supabase Error: ' + error.message + '\nDetails: ' + error.details);
+    }
+  } catch (err) {
+    console.error('Network exception adding client:', err);
+    // Offline local creation
+    const offlineRecord = {
+      id: 'offline-' + Date.now(),
+      ...clientData,
+      createdAt: new Date().toISOString()
+    };
+    try {
+      const cached = JSON.parse(localStorage.getItem(CACHE_PREFIX + prodId) || '[]');
+      cached.push(offlineRecord);
+      localStorage.setItem(CACHE_PREFIX + prodId, JSON.stringify(cached));
+    } catch (e) {}
+    return offlineRecord;
+  }
+
+  return null;
 };
 
 export const updateClient = async (productId, clientId, updatedData) => {
-  const { data, error } = await supabase
-    .from('clients')
-    .update({ client_data: updatedData })
-    .eq('id', clientId)
-    .select();
+  try {
+    const { data, error } = await supabase
+      .from('clients')
+      .update({ client_data: updatedData })
+      .eq('id', clientId)
+      .select();
 
-  if (error) {
-    console.error('Error updating client:', error);
-    return null;
+    if (!error && data && data.length > 0) {
+      const record = {
+        id: data[0].id,
+        ...data[0].client_data,
+        createdAt: data[0].created_at
+      };
+
+      // Update offline cache
+      try {
+        const cached = JSON.parse(localStorage.getItem(CACHE_PREFIX + productId) || '[]');
+        const updated = cached.map(c => String(c.id) === String(clientId) ? record : c);
+        localStorage.setItem(CACHE_PREFIX + productId, JSON.stringify(updated));
+      } catch (e) {}
+
+      return record;
+    }
+
+    if (error) {
+      console.error('Error updating client:', error);
+    }
+  } catch (err) {
+    console.warn('Network issue updating client, saving offline locally:', err);
+    try {
+      const cached = JSON.parse(localStorage.getItem(CACHE_PREFIX + productId) || '[]');
+      const record = { id: clientId, ...updatedData };
+      const updated = cached.map(c => String(c.id) === String(clientId) ? { ...c, ...record } : c);
+      localStorage.setItem(CACHE_PREFIX + productId, JSON.stringify(updated));
+      return record;
+    } catch (e) {}
   }
 
-  return {
-    id: data[0].id,
-    ...data[0].client_data,
-    createdAt: data[0].created_at
-  };
+  return null;
 };
 
+// Persist auth in both localStorage and sessionStorage so refresh/new window never loses session
 export const setAuth = (isLoggedIn) => {
-  sessionStorage.setItem(AUTH_KEY, JSON.stringify({ isLoggedIn }));
+  const payload = JSON.stringify({ isLoggedIn: Boolean(isLoggedIn) });
+  if (isLoggedIn) {
+    localStorage.setItem(AUTH_KEY, payload);
+    sessionStorage.setItem(AUTH_KEY, payload);
+  } else {
+    localStorage.removeItem(AUTH_KEY);
+    sessionStorage.removeItem(AUTH_KEY);
+  }
 };
 
 export const getAuth = () => {
-  const auth = JSON.parse(sessionStorage.getItem(AUTH_KEY) || '{"isLoggedIn": false}');
-  return auth.isLoggedIn;
+  try {
+    const local = localStorage.getItem(AUTH_KEY);
+    if (local) {
+      const parsed = JSON.parse(local);
+      if (parsed.isLoggedIn) return true;
+    }
+  } catch (e) {}
+
+  try {
+    const session = sessionStorage.getItem(AUTH_KEY);
+    if (session) {
+      const parsed = JSON.parse(session);
+      if (parsed.isLoggedIn) return true;
+    }
+  } catch (e) {}
+
+  return false;
 };
 
 export const logout = () => {
+  localStorage.removeItem(AUTH_KEY);
   sessionStorage.removeItem(AUTH_KEY);
 };

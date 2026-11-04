@@ -1,9 +1,11 @@
 /* src/pages/Login.css */
 
 .login-page-body {
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
     font-family: Inter, "Segoe UI", Arial, sans-serif;
     background:
         radial-gradient(
@@ -415,11 +417,19 @@
     padding-left: 35px;
 }
 
-/* Dark button */
-.theme-toggle {
+/* Top actions bar */
+.login-top-actions {
     position: absolute;
     top: 35px;
     right: 35px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 10;
+}
+
+/* Dark button */
+.theme-toggle {
     height: 45px;
     padding: 0 20px;
     display: flex;
@@ -735,12 +745,17 @@
     .login-page-body {
         padding: 0;
         background: #fff;
+        min-height: 100vh;
+        height: auto;
+        display: block;
+        overflow-y: auto;
     }
     .login-wrapper {
         min-height: 100vh;
         border-radius: 0;
         display: block;
         box-shadow: none;
+        border: none;
     }
     .branding-panel {
         display: none;
@@ -750,37 +765,64 @@
         clip-path: none;
         border-radius: 0;
         min-height: 100vh;
-        padding: 90px 30px 50px;
+        padding: 25px 24px 40px;
+    }
+    .login-top-actions {
+        position: static;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
     }
     .form-inner {
         padding: 0;
-    }
-    .theme-toggle {
-        top: 25px;
-        right: 25px;
+        max-width: 480px;
     }
 }
 
 @media (max-width: 500px) {
     .form-panel {
-        padding-left: 22px;
-        padding-right: 22px;
+        padding: 20px 16px 36px;
+    }
+    .form-header {
+        margin-bottom: 25px;
+    }
+    .security-icon {
+        width: 68px;
+        height: 68px;
+        font-size: 30px;
+        margin-bottom: 16px;
     }
     .form-header h1 {
-        font-size: 29px;
+        font-size: 26px;
+    }
+    .form-header p {
+        font-size: 15px;
+    }
+    .field {
+        margin-bottom: 20px;
     }
     .social-buttons {
         grid-template-columns: 1fr;
     }
     .input-wrapper input {
-        height: 60px;
-        font-size: 15px;
+        height: 52px;
+        font-size: 16px;
+        padding: 0 45px 0 48px;
+    }
+    .input-icon {
+        font-size: 18px;
+        left: 16px;
     }
     .login-btn {
-        height: 60px;
+        height: 52px;
+        font-size: 17px;
     }
     .form-options {
         font-size: 13px;
+        margin-bottom: 24px;
     }
 }
 

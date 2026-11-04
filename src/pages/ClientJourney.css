@@ -1,43 +1,69 @@
+/* src/pages/ClientJourney.css */
+
 .journey-body {
     background-color: #fafafb;
     min-height: 100vh;
+    min-height: 100dvh;
     font-family: Inter, "Segoe UI", Arial, sans-serif;
     color: #0f172a;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Header */
 .journey-header {
-    padding: 20px 40px;
-    background-color: transparent;
+    padding: 14px 36px;
+    background-color: #ffffff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .btn-back {
-    background: transparent;
-    border: none;
-    display: flex;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: #64748b;
-    font-size: 14px;
-    font-weight: 500;
+    padding: 7px 14px;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
-    transition: color 0.2s;
+    transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
 .btn-back:hover {
+    background: #f1f5f9;
     color: #0f172a;
+    border-color: #cbd5e1;
+}
+
+.journey-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 /* Main Container */
 .journey-container {
-    max-width: 1200px;
+    width: 100%;
+    max-width: 1440px;
     margin: 0 auto;
-    padding: 10px 40px 60px;
+    padding: 24px 36px 60px;
+    flex-grow: 1;
 }
 
 /* Title Section */
 .journey-title-section {
-    margin-bottom: 30px;
+    margin-bottom: 24px;
 }
 
 .journey-name-wrap {
@@ -45,32 +71,36 @@
     align-items: center;
     gap: 12px;
     margin-bottom: 8px;
+    flex-wrap: wrap;
 }
 
 .journey-name {
-    font-size: 28px;
-    font-weight: 700;
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 800;
     color: #1a1a1a;
+    line-height: 1.2;
 }
 
 .journey-badge {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     padding: 4px 10px;
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     background-color: #fdf2f2;
     color: #800000;
+    border: 1px solid rgba(128, 0, 0, 0.15);
 }
 
 .journey-subtitle {
     display: flex;
-    gap: 20px;
+    gap: 18px;
     color: #64748b;
     font-size: 14px;
+    flex-wrap: wrap;
 }
 
 .subtitle-item {
@@ -80,19 +110,30 @@
 }
 
 /* Timeline / Progress Bar */
+.progress-container-outer {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    padding: 24px 20px 20px;
+    margin-bottom: 28px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
 .progress-container {
     display: flex;
     justify-content: space-between;
     position: relative;
-    margin-bottom: 40px;
+    min-width: 600px;
     padding: 0 20px;
 }
 
 .progress-line {
     position: absolute;
     top: 15px;
-    left: 40px;
-    right: 40px;
+    left: 45px;
+    right: 45px;
     height: 2px;
     background-color: #e2e8f0;
     z-index: 1;
@@ -113,8 +154,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
-    width: 100px;
+    gap: 10px;
+    width: 95px;
     cursor: pointer;
 }
 
@@ -133,12 +174,13 @@
 .step-circle.completed {
     border-color: #800000;
     color: #800000;
+    background-color: #fdf2f2;
 }
 
 .step-circle.active {
     border-color: #800000;
     color: #800000;
-    box-shadow: 0 0 0 4px rgba(128,0,0,0.1);
+    box-shadow: 0 0 0 4px rgba(128, 0, 0, 0.12);
 }
 
 .step-circle.closed {
@@ -148,15 +190,16 @@
 }
 
 .step-label {
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 11px;
+    font-weight: 600;
     color: #64748b;
     text-align: center;
+    line-height: 1.3;
 }
 
 .step-label.active {
     color: #0f172a;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .step-label.closed {
@@ -169,14 +212,16 @@
     display: grid;
     grid-template-columns: 320px 1fr;
     gap: 24px;
+    align-items: start;
 }
 
 /* Info Card */
 .info-card {
     background: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .info-card-header {
@@ -184,19 +229,24 @@
     align-items: center;
     gap: 8px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     color: #0f172a;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f1f5f9;
 }
 
 .info-field {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 .info-label {
-    font-size: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     color: #64748b;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
 .info-val {
@@ -207,20 +257,20 @@
 
 .info-divider {
     height: 1px;
-    background-color: #e2e8f0;
-    margin: 24px 0;
+    background-color: #f1f5f9;
+    margin: 20px 0;
 }
 
 .info-bottom {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
 }
 
 .info-bottom-item {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     font-size: 13px;
     color: #334155;
     font-weight: 500;
@@ -230,25 +280,27 @@
 .logger-card {
     background: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
     margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .logger-tabs {
     display: flex;
     border-bottom: 1px solid #e2e8f0;
+    background: #fafafb;
 }
 
 .logger-tab {
     flex: 1;
-    padding: 16px;
+    padding: 14px 16px;
     background: transparent;
     border: none;
     border-bottom: 2px solid transparent;
     color: #64748b;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -260,37 +312,58 @@
 .logger-tab.active {
     border-bottom-color: #800000;
     color: #800000;
-    background-color: #fcfdfd;
+    background-color: #ffffff;
 }
 
 .logger-body {
     padding: 20px;
 }
 
+.logger-date-input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1.5px solid #e2e8f0;
+    font-size: 14px;
+    background: #fff;
+    color: #1e293b;
+    outline: none;
+    font-family: inherit;
+}
+
+.logger-date-input:focus {
+    border-color: #800000;
+}
+
 .logger-input-wrap {
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
     overflow: hidden;
     margin-bottom: 16px;
+    transition: border-color 0.2s;
+}
+
+.logger-input-wrap:focus-within {
+    border-color: #800000;
 }
 
 .logger-input-wrap textarea {
     width: 100%;
     border: none;
-    padding: 16px;
+    padding: 14px 16px;
     font-size: 14px;
-    min-height: 120px;
+    min-height: 110px;
     resize: vertical;
     outline: none;
     font-family: inherit;
-    color: #334155;
+    color: #1e293b;
 }
 
 .logger-toolbar {
     display: flex;
-    gap: 12px;
-    padding: 10px 16px;
-    border-top: 1px solid #e2e8f0;
+    gap: 10px;
+    padding: 8px 14px;
+    border-top: 1px solid #f1f5f9;
     background-color: #f8fafc;
     color: #64748b;
 }
@@ -300,45 +373,56 @@
     border: none;
     color: #64748b;
     cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: color 0.15s;
 }
 
 .logger-toolbar button:hover {
     color: #0f172a;
 }
 
+.logger-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
 .btn-log {
     background-color: #800000;
     color: white;
     border: none;
-    border-radius: 6px;
-    padding: 10px 20px;
+    border-radius: 8px;
+    padding: 9px 22px;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    float: right;
-    box-shadow: 0 2px 4px rgba(128,0,0,0.2);
+    box-shadow: 0 2px 6px rgba(128, 0, 0, 0.2);
+    transition: all 0.2s;
 }
 
 .btn-log:hover {
-    background-color: #600000;
+    background-color: #650019;
 }
 
 /* Activity Feed */
 .feed-card {
     background: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 20px;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .feed-header {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 700;
     color: #0f172a;
     margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f1f5f9;
 }
 
 .feed-list {
@@ -349,7 +433,7 @@
 
 .feed-item {
     display: flex;
-    gap: 16px;
+    gap: 14px;
     padding-bottom: 16px;
     border-bottom: 1px solid #f1f5f9;
 }
@@ -360,8 +444,8 @@
 }
 
 .feed-icon {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -373,13 +457,16 @@
 
 .feed-content {
     flex: 1;
+    min-width: 0;
 }
 
 .feed-top {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 .feed-title {
@@ -389,12 +476,15 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-wrap: wrap;
 }
 
 .feed-badge {
     font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 4px;
     background-color: #f1f5f9;
     color: #64748b;
 }
@@ -402,14 +492,18 @@
 .feed-meta {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     font-size: 12px;
     color: #94a3b8;
 }
 
+.feed-date {
+    white-space: nowrap;
+}
+
 .feed-actions {
     display: flex;
-    gap: 8px;
+    gap: 6px;
 }
 
 .feed-actions button {
@@ -417,6 +511,12 @@
     border: none;
     color: #94a3b8;
     cursor: pointer;
+    padding: 3px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s;
 }
 
 .feed-actions button:hover {
@@ -426,43 +526,107 @@
 .feed-text {
     font-size: 14px;
     color: #475569;
-    line-height: 1.5;
+    line-height: 1.55;
+    word-break: break-word;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+.feed-edit-box {
+    margin-top: 10px;
+}
+
+.feed-edit-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    font-size: 13px;
+    resize: vertical;
+    font-family: inherit;
+    margin-bottom: 8px;
+    outline: none;
+}
+
+.feed-edit-textarea:focus {
+    border-color: #800000;
+}
+
+.feed-edit-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.btn-feed-cancel {
+    background: transparent;
+    border: 1px solid #cbd5e1;
+    padding: 5px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+}
+
+.btn-feed-save {
+    background: #800000;
+    color: white;
+    border: none;
+    padding: 5px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ========================================================================= */
+/* Responsive Adjustments */
+/* ========================================================================= */
+
+@media (max-width: 950px) {
+    .journey-grid {
+        grid-template-columns: 1fr;
+    }
     .journey-header {
-        padding: 15px 20px;
+        padding: 12px 20px;
     }
     .journey-container {
-        padding: 10px 20px 40px;
+        padding: 20px 20px 40px;
+    }
+}
+
+@media (max-width: 640px) {
+    .journey-header {
+        padding: 10px 14px;
+    }
+    .journey-container {
+        padding: 16px 14px 40px;
+    }
+    .btn-back span {
+        display: none;
     }
     .journey-name {
         font-size: 22px;
     }
-    .journey-title-section {
+    .progress-container-outer {
+        padding: 18px 12px 16px;
         margin-bottom: 20px;
     }
-    .progress-container {
-        overflow-x: auto;
-        padding-bottom: 10px;
-    }
-    .progress-step {
-        min-width: 100px;
-    }
-    .progress-line {
-        /* Adjust absolute line to stretch if content scrolls */
-        right: auto;
-        width: calc(100px * 6 - 80px); /* 6 steps * 100px - padding */
-    }
-    .journey-grid {
-        grid-template-columns: 1fr;
-    }
     .logger-tabs {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
     }
     .logger-tab {
-        padding: 12px;
+        padding: 10px 8px;
         font-size: 12px;
+    }
+    .logger-body {
+        padding: 16px;
+    }
+    .feed-card {
+        padding: 16px;
+    }
+    .feed-top {
+        flex-direction: column;
+        gap: 4px;
     }
 }

@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { PRODUCTS, logout, getTotalClientsCount } from '../store/DataStore';
+import LanguageSwitcher from '../components/LanguageSwitcher';
+import PWAInstallButton from '../components/PWAInstallButton';
 import { 
   LogOut, 
   ChevronRight, 
@@ -8,11 +11,9 @@ import {
   Users, 
   Building2, 
   Vote, 
-  Share2, 
   Bot, 
   MoreHorizontal,
   BrainCircuit,
-  Cpu,
   ChevronDown
 } from 'lucide-react';
 import './ProductSelect.css';
@@ -29,6 +30,7 @@ const getProductIcon = (name) => {
 
 export default function ProductSelect() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [totalProducts, setTotalProducts] = useState(0);
   const [activeClients, setActiveClients] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -74,19 +76,20 @@ export default function ProductSelect() {
         <path fill="url(#dots)" d="M400,600 C250,550 150,450 100,300 C50,150 250,50 400,0 L800,0 L800,600 Z"/>
       </svg>
 
-
       {/* Header */}
       <header className="modern-header">
         <div className="logo-container">
           <div className="brand-text">
-            <span className="brand-name">CODECRAFT</span>
-            <span className="brand-sub">SOLUTIONS</span>
+            <span className="brand-name">{t('login.brand_name')}</span>
+            <span className="brand-sub">{t('login.brand_sub')}</span>
           </div>
         </div>
         
         <div className="header-actions">
-          <button onClick={handleLogout} className="logout-btn">
-            <LogOut size={16} strokeWidth={2.5} /> Logout
+          <LanguageSwitcher />
+          <PWAInstallButton />
+          <button onClick={handleLogout} className="logout-btn" title={t('dashboard.logout')}>
+            <LogOut size={16} strokeWidth={2.5} /> <span className="logout-text">{t('dashboard.logout')}</span>
           </button>
           <div className="user-avatar-wrap">
             <div className="user-avatar">K</div>
@@ -100,8 +103,8 @@ export default function ProductSelect() {
         
         <div className="dash-hero">
           <div className="hero-text animate-fade-in">
-            <h1 className="title">Product Dashboards</h1>
-            <p className="subtitle">Manage and monitor all your products</p>
+            <h1 className="title">{t('dashboard.title')}</h1>
+            <p className="subtitle">{t('dashboard.subtitle')}</p>
             <div className="underline"></div>
           </div>
 
@@ -112,7 +115,7 @@ export default function ProductSelect() {
               </div>
               <div className="stat-content">
                 <span className="stat-value">{isLoading ? '...' : totalProducts}</span>
-                <span className="stat-label">Total Products</span>
+                <span className="stat-label">{t('dashboard.total_products')}</span>
               </div>
             </div>
             <div className="stat-divider"></div>
@@ -123,7 +126,7 @@ export default function ProductSelect() {
               </div>
               <div className="stat-content">
                 <span className="stat-value">{isLoading ? '...' : activeClients}</span>
-                <span className="stat-label">Active Clients</span>
+                <span className="stat-label">{t('dashboard.active_clients')}</span>
               </div>
             </div>
           </div>
@@ -144,13 +147,13 @@ export default function ProductSelect() {
                   </div>
                   <MoreHorizontal size={24} className="card-menu" />
                 </div>
-                <h2 className="card-title">{product.name}</h2>
+                <h2 className="card-title">{t(`products.${product.id}.name`)}</h2>
                 <div className="card-line"></div>
-                <p className="card-desc">{product.description}</p>
+                <p className="card-desc">{t(`products.${product.id}.desc`)}</p>
               </div>
               
               <div className="card-footer">
-                Manage Clients <ChevronRight size={18} strokeWidth={2.5} />
+                {t('dashboard.manage_clients')} <ChevronRight size={18} strokeWidth={2.5} />
               </div>
             </div>
           ))}

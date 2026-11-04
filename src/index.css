@@ -502,9 +502,10 @@ input[type="datetime-local"].input-field::-webkit-calendar-picker-indicator:hove
   gap: 1rem;
 }
 
-/* Base override for white space in tables */
+/* Base override for white space in tables and buttons */
 .data-table th,
-.data-table td {
+.data-table td,
+button {
   white-space: nowrap;
 }
 
@@ -567,5 +568,32 @@ input[type="datetime-local"].input-field::-webkit-calendar-picker-indicator:hove
 @media (max-width: 480px) {
   .app-header button.btn-outline {
     width: 100%;
+  }
+}
+
+
+/* ========================================================================= */
+/* PWA Window Controls Overlay & Desktop Standalone Utilities */
+/* ========================================================================= */
+
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Standalone desktop app enhancements */
+@media all and (display-mode: standalone), (display-mode: window-controls-overlay) {
+  /* Prevent accidental text selection like native apps on header buttons */
+  .modern-header, .tracker-header, .journey-header {
+    user-select: none;
+    -webkit-user-select: none;
   }
 }

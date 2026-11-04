@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { setAuth } from '../store/DataStore';
+import LanguageSwitcher from '../components/LanguageSwitcher';
+import PWAInstallButton from '../components/PWAInstallButton';
 import './Login.css';
-import logoImg from '../assets/logo.jpeg';
 
 export default function Login() {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('krishnaniti@gmail.com');
   const [password, setPassword] = useState('Krishnaniti123');
   const [showPassword, setShowPassword] = useState(false);
@@ -15,9 +18,14 @@ export default function Login() {
 
   useEffect(() => {
     const handleResize = () => {
-      const availableHeight = window.innerHeight - 68; // Account for 34px padding top+bottom
+      // Don't apply scale transform on mobile/tablet viewports to allow natural scrolling
+      if (window.innerWidth <= 850) {
+        setScale(1);
+        return;
+      }
+      const availableHeight = window.innerHeight - 68;
       if (availableHeight < 750) {
-        setScale(availableHeight / 750);
+        setScale(Math.max(0.7, availableHeight / 750));
       } else {
         setScale(1);
       }
@@ -30,24 +38,27 @@ export default function Login() {
   }, []);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogin = (e) => {
     e.preventDefault();
     if (username === 'krishnaniti@gmail.com' && password === 'Krishnaniti123') {
       setIsLoggingIn(true);
 
-      // Simulate API delay as requested in the HTML script
+      // Simulate API delay
       setTimeout(() => {
         setLoginSuccess(true);
         setIsLoggingIn(false);
 
         setTimeout(() => {
           setAuth(true);
-          navigate('/products');
+          const savedPath = localStorage.getItem('codecraft_last_visited_path');
+          const target = location.state?.from?.pathname || (savedPath && savedPath !== '/' ? savedPath : '/products');
+          navigate(target, { replace: true });
         }, 800);
       }, 1000);
     } else {
-      alert("Invalid Username or Password!");
+      alert(t('login.invalid_credentials'));
     }
   };
 
@@ -55,7 +66,7 @@ export default function Login() {
     <div className={`login-page-body ${isDark ? 'dark-mode' : ''}`}>
       <div 
         className="login-wrapper" 
-        style={{ transform: `scale(${scale})`, transformOrigin: 'center center' }}
+        style={scale !== 1 ? { transform: `scale(${scale})`, transformOrigin: 'center center' } : undefined}
       >
 
         {/* =========================
@@ -68,11 +79,10 @@ export default function Login() {
 
           {/* Logo */}
           <div className="brand">
-
             <div className="brand-text">
               <div className="brand-name">
-                CODECRAFT
-                <span>SOLUTIONS</span>
+                {t('login.brand_name')}
+                <span>{t('login.brand_sub')}</span>
               </div>
             </div>
           </div>
@@ -80,42 +90,36 @@ export default function Login() {
           {/* Hero */}
           <div className="hero-content">
             <h2 className="hero-title">
-              Track. Monitor.<br />
-              <span>Deliver.</span>
+              {t('login.hero_title_1')}<br />
+              <span>{t('login.hero_title_2')}</span>
             </h2>
             <p className="hero-description">
-              Welcome back! Log in to access your projects,
-              updates, and client insights all in one place.
+              {t('login.hero_desc')}
             </p>
-
-
 
             {/* Features */}
             <div className="features">
               <div className="feature">
                 <div className="feature-icon">♢</div>
-                <div className="feature-title">Secure</div>
-                <div className="feature-text">Your data is safe<br />with us.</div>
+                <div className="feature-title">{t('login.feature_1_title')}</div>
+                <div className="feature-text" dangerouslySetInnerHTML={{ __html: t('login.feature_1_desc') }}></div>
               </div>
               <div className="feature">
                 <div className="feature-icon">⚡</div>
-                <div className="feature-title">Fast</div>
-                <div className="feature-text">Quick access to<br />what matters.</div>
+                <div className="feature-title">{t('login.feature_2_title')}</div>
+                <div className="feature-text" dangerouslySetInnerHTML={{ __html: t('login.feature_2_desc') }}></div>
               </div>
               <div className="feature">
                 <div className="feature-icon">▥</div>
-                <div className="feature-title">Reliable</div>
-                <div className="feature-text">Insights you can<br />count on.</div>
+                <div className="feature-title">{t('login.feature_3_title')}</div>
+                <div className="feature-text" dangerouslySetInnerHTML={{ __html: t('login.feature_3_desc') }}></div>
               </div>
             </div>
 
             {/* Quote */}
             <div className="quote">
               <div className="quote-mark">“</div>
-              <div>
-                Building digital solutions that drive<br />
-                success for your business.”
-              </div>
+              <div dangerouslySetInnerHTML={{ __html: t('login.quote') }}></div>
             </div>
           </div>
         </section>
@@ -124,21 +128,25 @@ export default function Login() {
              RIGHT LOGIN PANEL
         ========================== */}
         <section className="form-panel">
-          <button
-            className="theme-toggle"
-            type="button"
-            onClick={() => setIsDark(!isDark)}
-          >
-            ◐ <span>{isDark ? 'Light' : 'Dark'}</span>
-          </button>
+          <div className="login-top-actions">
+            <LanguageSwitcher />
+            <PWAInstallButton variant="login-variant" />
+            <button
+              className="theme-toggle"
+              type="button"
+              onClick={() => setIsDark(!isDark)}
+            >
+              ◐ <span>{isDark ? t('login.light') : t('login.dark')}</span>
+            </button>
+          </div>
 
           <div className="form-inner">
 
             {/* Header */}
             <div className="form-header">
               <div className="security-icon">♙</div>
-              <h1>Welcome Back</h1>
-              <p>Client Tracking Portal</p>
+              <h1>{t('login.welcome_back')}</h1>
+              <p>{t('login.portal_title')}</p>
               <div className="small-line"></div>
             </div>
 
@@ -147,7 +155,7 @@ export default function Login() {
 
               {/* Username */}
               <div className="field">
-                <label htmlFor="username">USERNAME</label>
+                <label htmlFor="username">{t('login.username_label')}</label>
                 <div className="input-wrapper">
                   <span className="input-icon">♙</span>
                   <input
@@ -155,7 +163,7 @@ export default function Login() {
                     type="email"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Enter your username"
+                    placeholder={t('login.username_placeholder')}
                     autoComplete="username"
                     required
                   />
@@ -164,7 +172,7 @@ export default function Login() {
 
               {/* Password */}
               <div className="field">
-                <label htmlFor="password">PASSWORD</label>
+                <label htmlFor="password">{t('login.password_label')}</label>
                 <div className="input-wrapper">
                   <span className="input-icon">♙</span>
                   <input
@@ -172,7 +180,7 @@ export default function Login() {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
+                    placeholder={t('login.password_placeholder')}
                     autoComplete="current-password"
                     required
                   />
@@ -191,9 +199,9 @@ export default function Login() {
               <div className="form-options">
                 <label className="remember">
                   <input type="checkbox" id="remember" />
-                  <span>Remember me</span>
+                  <span>{t('login.remember_me')}</span>
                 </label>
-                <a href="#" className="forgot">Forgot Password?</a>
+                <a href="#" className="forgot">{t('login.forgot_password')}</a>
               </div>
 
               {/* Login Button */}
@@ -205,29 +213,25 @@ export default function Login() {
               >
                 {isLoggingIn ? (
                   <>
-                    <span>Signing in...</span>
+                    <span>{t('login.signing_in')}</span>
                     <span className="arrow">→</span>
                   </>
                 ) : loginSuccess ? (
                   <>
-                    <span>Login Successful</span>
+                    <span>{t('login.login_success')}</span>
                     <span>✓</span>
                   </>
                 ) : (
                   <>
-                    <span>Login</span>
+                    <span>{t('login.login_button')}</span>
                     <span className="arrow">→</span>
                   </>
                 )}
               </button>
             </form>
 
-
-
             {/* Support */}
-            <div className="support">
-              Need help? <a href="#">Contact support</a>
-            </div>
+            <div className="support" dangerouslySetInnerHTML={{ __html: t('login.support') }}></div>
 
           </div>
         </section>
