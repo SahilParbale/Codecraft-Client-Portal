@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getClients, updateClient, findProductById } from '../store/DataStore';
-import LanguageSwitcher from '../components/LanguageSwitcher';
 import PWAInstallButton from '../components/PWAInstallButton';
 import { 
   ArrowLeft, Check, Lock, Building2, MapPin, Calendar, 
@@ -10,7 +9,6 @@ import {
 } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import { translateClientField } from '../utils/translator';
 import './ClientJourney.css';
 
 const PIPELINE_STAGES = [
@@ -25,7 +23,7 @@ const PIPELINE_STAGES = [
 export default function ClientJourney() {
   const { productId, clientId } = useParams();
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const location = useLocation();
   const product = findProductById(productId);
   
@@ -50,10 +48,11 @@ export default function ClientJourney() {
   const [isSavingLog, setIsSavingLog] = useState(false);
 
   const getTranslatedValue = (obj, fieldKey) => {
-    if (obj.translations && obj.translations[fieldKey] && obj.translations[fieldKey][i18n.language]) {
-      return obj.translations[fieldKey][i18n.language];
+    if (!obj) return '';
+    if (obj.translations && obj.translations[fieldKey] && obj.translations[fieldKey].en) {
+      return obj.translations[fieldKey].en;
     }
-    return obj[fieldKey];
+    return obj[fieldKey] || '';
   };
 
   useEffect(() => {
@@ -76,7 +75,9 @@ export default function ClientJourney() {
       try {
         const cached = JSON.parse(localStorage.getItem('codecraft_cached_clients_' + productId) || '[]');
         found = cached.find(c => String(c.id) === String(clientId));
-      } catch (e) {}
+      } catch {
+        // Ignore cache read failures
+      }
     }
 
     if (!found) {
@@ -103,17 +104,12 @@ export default function ClientJourney() {
     if (!formData.details) return;
     setIsSavingLog(true);
 
-    const detailsTranslations = await translateClientField(formData.details, i18n.language);
-
     const eventDate = activeTab === 'DEMO' ? formData.date : new Date().toISOString();
     const newEvent = { 
       id: Date.now(),
       type: activeTab, 
       date: eventDate, 
-      details: formData.details,
-      translations: {
-        details: detailsTranslations
-      }
+      details: formData.details
     };
 
     const updatedEvents = [newEvent, ...client.events];
@@ -134,8 +130,7 @@ export default function ClientJourney() {
 
   const handleEditEventSubmit = async (eventId) => {
     setIsSavingLog(true);
-    const detailsTranslations = await translateClientField(editingContent, i18n.language);
-    const updatedEvents = client.events.map(e => e.id === eventId ? { ...e, details: editingContent, translations: { details: detailsTranslations } } : e);
+    const updatedEvents = client.events.map(e => e.id === eventId ? { ...e, details: editingContent } : e);
     const updatedClient = await updateClient(productId, client.id, { ...client, events: updatedEvents });
     if (updatedClient) {
       setClient({ ...updatedClient, events: updatedEvents });
@@ -196,7 +191,6 @@ export default function ClientJourney() {
         </button>
 
         <div className="journey-header-actions">
-          <LanguageSwitcher />
           <PWAInstallButton />
         </div>
       </header>

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { setAuth } from '../store/DataStore';
-import LanguageSwitcher from '../components/LanguageSwitcher';
 import PWAInstallButton from '../components/PWAInstallButton';
 import './Login.css';
 
@@ -129,7 +128,6 @@ export default function Login() {
         ========================== */}
         <section className="form-panel">
           <div className="login-top-actions">
-            <LanguageSwitcher />
             <PWAInstallButton variant="login-variant" />
             <button
               className="theme-toggle"

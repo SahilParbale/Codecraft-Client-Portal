@@ -11,8 +11,7 @@ const PRECACHE_ASSETS = [
   '/icon-192x192.png',
   '/icon-512x512.png',
   '/icon-maskable-512x512.png',
-  '/apple-touch-icon.png',
-  '/NotoSansDevanagari-Regular.ttf'
+  '/apple-touch-icon.png'
 ];
 
 // Install: Cache critical assets

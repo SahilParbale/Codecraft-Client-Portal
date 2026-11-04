@@ -118,7 +118,9 @@ export const getTotalClientsCount = async () => {
     try {
       const data = localStorage.getItem(CACHE_PREFIX + p.id);
       if (data) total += JSON.parse(data).length;
-    } catch (e) {}
+    } catch {
+      // Ignore cache read failures
+    }
   });
 
   return total;
@@ -152,7 +154,9 @@ export const addClient = async (productIdOrClient, maybeClientData) => {
         const cached = JSON.parse(localStorage.getItem(CACHE_PREFIX + prodId) || '[]');
         cached.push(newRecord);
         localStorage.setItem(CACHE_PREFIX + prodId, JSON.stringify(cached));
-      } catch (e) {}
+      } catch {
+        // Ignore cache write failures
+      }
 
       return newRecord;
     }
@@ -173,7 +177,9 @@ export const addClient = async (productIdOrClient, maybeClientData) => {
       const cached = JSON.parse(localStorage.getItem(CACHE_PREFIX + prodId) || '[]');
       cached.push(offlineRecord);
       localStorage.setItem(CACHE_PREFIX + prodId, JSON.stringify(cached));
-    } catch (e) {}
+    } catch {
+      // Ignore cache write failures
+    }
     return offlineRecord;
   }
 
@@ -200,7 +206,9 @@ export const updateClient = async (productId, clientId, updatedData) => {
         const cached = JSON.parse(localStorage.getItem(CACHE_PREFIX + productId) || '[]');
         const updated = cached.map(c => String(c.id) === String(clientId) ? record : c);
         localStorage.setItem(CACHE_PREFIX + productId, JSON.stringify(updated));
-      } catch (e) {}
+      } catch {
+        // Ignore cache write failures
+      }
 
       return record;
     }
@@ -216,7 +224,9 @@ export const updateClient = async (productId, clientId, updatedData) => {
       const updated = cached.map(c => String(c.id) === String(clientId) ? { ...c, ...record } : c);
       localStorage.setItem(CACHE_PREFIX + productId, JSON.stringify(updated));
       return record;
-    } catch (e) {}
+    } catch {
+      // Ignore cache write failures
+    }
   }
 
   return null;
@@ -241,7 +251,9 @@ export const getAuth = () => {
       const parsed = JSON.parse(local);
       if (parsed.isLoggedIn) return true;
     }
-  } catch (e) {}
+  } catch {
+    // Ignore storage read error
+  }
 
   try {
     const session = sessionStorage.getItem(AUTH_KEY);
@@ -249,7 +261,9 @@ export const getAuth = () => {
       const parsed = JSON.parse(session);
       if (parsed.isLoggedIn) return true;
     }
-  } catch (e) {}
+  } catch {
+    // Ignore storage read error
+  }
 
   return false;
 };

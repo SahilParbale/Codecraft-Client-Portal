@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getClients, addClient, updateClient, findProductById } from '../store/DataStore';
-import LanguageSwitcher from '../components/LanguageSwitcher';
 import PWAInstallButton from '../components/PWAInstallButton';
 import { 
   X, Edit2, Plus, Code, FileText, Building2, Download, ArrowLeft
@@ -10,7 +9,6 @@ import {
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import { translateClientField } from '../utils/translator';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import './ClientTracker.css';
@@ -18,7 +16,7 @@ import './ClientTracker.css';
 export default function ClientTracker() {
   const { productId } = useParams();
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const product = findProductById(productId);
   
   const [clients, setClients] = useState([]);
@@ -30,10 +28,10 @@ export default function ClientTracker() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getTranslatedValue = (client, fieldKey) => {
-    if (client.translations && client.translations[fieldKey] && client.translations[fieldKey][i18n.language]) {
-      return client.translations[fieldKey][i18n.language];
+    if (client.translations && client.translations[fieldKey] && client.translations[fieldKey].en) {
+      return client.translations[fieldKey].en;
     }
-    return client[fieldKey];
+    return client[fieldKey] || '';
   };
 
   useEffect(() => {
@@ -87,22 +85,9 @@ export default function ClientTracker() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const translations = {};
-    if (formData.name) {
-      translations.name = await translateClientField(formData.name, i18n.language);
-    }
-    
-    // Translate all schema fields that are text-based
-    for (const field of product.schema) {
-      if (field.type === 'text' && formData[field.key]) {
-        translations[field.key] = await translateClientField(formData[field.key], i18n.language);
-      }
-    }
-
     const newClient = {
       ...formData,
-      productId,
-      translations
+      productId
     };
 
     if (editingClientId) {
@@ -119,33 +104,10 @@ export default function ClientTracker() {
   const downloadReport = async (title, clientData) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.width;
+    doc.setFont('helvetica');
+    const tableStyles = { font: 'helvetica' };
     
-    // Load Marathi Font
-    try {
-      const fontRes = await fetch('/NotoSansDevanagari-Regular.ttf');
-      if (fontRes.ok) {
-        const fontBuffer = await fontRes.arrayBuffer();
-        let binary = '';
-        const bytes = new Uint8Array(fontBuffer);
-        for (let i = 0; i < bytes.byteLength; i++) {
-          binary += String.fromCharCode(bytes[i]);
-        }
-        const base64Font = window.btoa(binary);
-        doc.addFileToVFS('NotoSansDevanagari.ttf', base64Font);
-        doc.addFont('NotoSansDevanagari.ttf', 'NotoSansDevanagari', 'normal');
-        doc.setFont('NotoSansDevanagari');
-      } else {
-        doc.setFont('helvetica');
-      }
-    } catch (err) {
-      console.warn("Failed to load custom font", err);
-      doc.setFont('helvetica');
-    }
-    
-    // Default styles for all autoTables
-    const tableStyles = { font: doc.getFont().fontName === 'NotoSansDevanagari' ? 'NotoSansDevanagari' : 'helvetica' };
-    
-    // Add Centered Professional Header
+    // Centered Professional Header
     doc.setFontSize(22);
     doc.setTextColor(128, 0, 0); // Maroon
     doc.text(title.toUpperCase(), pageWidth / 2, 22, { align: 'center' });
@@ -307,7 +269,6 @@ export default function ClientTracker() {
         </div>
 
         <div className="tracker-header-actions">
-          <LanguageSwitcher />
           <PWAInstallButton />
         </div>
       </header>
