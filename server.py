@@ -34,8 +34,8 @@ class SPAServerHandler(http.server.SimpleHTTPRequestHandler):
         return super().send_head()
 
     def end_headers(self):
-        # Prevent aggressive caching for sw.js and manifest
-        if self.path in ["/sw.js", "/manifest.webmanifest", "/manifest.json"]:
+        # Prevent aggressive caching for sw.js, manifest, and favicon
+        if any(self.path.startswith(p) for p in ["/sw.js", "/manifest.webmanifest", "/manifest.json", "/favicon.svg", "/favicon.ico"]):
             self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
         super().end_headers()
 
