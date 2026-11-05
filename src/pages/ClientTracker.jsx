@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getClients, addClient, updateClient, findProductById } from '../store/DataStore';
-import PWAInstallButton from '../components/PWAInstallButton';
+
 import { 
   X, Edit2, Plus, FileText, Building2, Download, ArrowLeft
 } from 'lucide-react';
@@ -269,7 +269,7 @@ export default function ClientTracker() {
         </div>
 
         <div className="tracker-header-actions">
-          <PWAInstallButton />
+
         </div>
       </header>
 

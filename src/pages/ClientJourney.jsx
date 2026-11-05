@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getClients, updateClient, findProductById } from '../store/DataStore';
-import PWAInstallButton from '../components/PWAInstallButton';
+
 import { 
   ArrowLeft, Check, Lock, Building2, MapPin, Calendar, 
   FileText, Phone, Bold, Italic, List, Link, Trash2, Edit2 
@@ -191,7 +191,7 @@ export default function ClientJourney() {
         </button>
 
         <div className="journey-header-actions">
-          <PWAInstallButton />
+
         </div>
       </header>
 

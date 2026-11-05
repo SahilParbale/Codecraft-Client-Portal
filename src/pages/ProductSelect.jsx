@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { PRODUCTS, logout, getTotalClientsCount } from '../store/DataStore';
-import PWAInstallButton from '../components/PWAInstallButton';
+
 import { 
   LogOut, 
   ChevronRight, 
@@ -86,7 +86,7 @@ export default function ProductSelect() {
         </div>
         
         <div className="header-actions">
-          <PWAInstallButton />
+
           <button onClick={handleLogout} className="logout-btn" title={t('dashboard.logout')}>
             <LogOut size={16} strokeWidth={2.5} /> <span className="logout-text">{t('dashboard.logout')}</span>
           </button>
