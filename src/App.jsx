@@ -4,22 +4,28 @@ import Login from './pages/Login';
 import ProductSelect from './pages/ProductSelect';
 import ClientTracker from './pages/ClientTracker';
 import ClientJourney from './pages/ClientJourney';
+import ClientTableView from './pages/ClientTableView';
 import { getAuth } from './store/DataStore';
 
 const LAST_PATH_KEY = 'codecraft_last_visited_path';
 
-// Navigation Tracker: remembers the active route so refresh or reopen returns to the exact same page
+// Navigation Tracker: remembers active workspace route so refresh returns to exact page
 const RouteTracker = () => {
   const location = useLocation();
   useEffect(() => {
-    if (location.pathname && location.pathname !== '/') {
+    // Only track authenticated workspace paths (never '/' or '/login')
+    if (
+      location.pathname && 
+      location.pathname !== '/' && 
+      location.pathname !== '/login'
+    ) {
       localStorage.setItem(LAST_PATH_KEY, location.pathname + location.search);
     }
   }, [location]);
   return null;
 };
 
-// Protected Route Component
+// Protected Route Component: enforces login for workspace pages
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = getAuth();
   const location = useLocation();
@@ -30,25 +36,16 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-// Route that redirects to products/last visited page if already logged in
-const PublicRoute = ({ children }) => {
-  const isAuthenticated = getAuth();
-  if (isAuthenticated) {
-    const savedPath = localStorage.getItem(LAST_PATH_KEY);
-    const destination = (savedPath && savedPath !== '/' && !savedPath.includes('login')) 
-      ? savedPath 
-      : '/products';
-    return <Navigate to={destination} replace />;
-  }
-  return children;
-};
-
 function App() {
   return (
     <Router>
       <RouteTracker />
       <Routes>
-        <Route path="/" element={<PublicRoute><Login /></PublicRoute>} />
+        {/* Default route ALWAYS opens the Login page */}
+        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+
+        {/* Protected Workspace Routes */}
         <Route 
           path="/products" 
           element={
@@ -65,6 +62,24 @@ function App() {
             </ProtectedRoute>
           } 
         />
+        {/* Dedicated Full Table View Pages */}
+        <Route 
+          path="/tracker/:productId/view-all" 
+          element={
+            <ProtectedRoute>
+              <ClientTableView />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/tracker/:productId/view-all/:category" 
+          element={
+            <ProtectedRoute>
+              <ClientTableView />
+            </ProtectedRoute>
+          } 
+        />
+        {/* Individual Client Journey */}
         <Route 
           path="/tracker/:productId/client/:clientId" 
           element={
@@ -73,6 +88,8 @@ function App() {
             </ProtectedRoute>
           } 
         />
+
+        {/* Catch-all redirect to login */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

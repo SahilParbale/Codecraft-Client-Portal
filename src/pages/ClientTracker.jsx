@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { getClients, addClient, updateClient, findProductById } from '../store/DataStore';
 
 import { 
-  X, Edit2, Plus, FileText, Building2, Download, ArrowLeft
+  X, Edit2, Plus, FileText, Building2, Download, ArrowLeft, Table
 } from 'lucide-react';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
@@ -275,6 +275,13 @@ export default function ClientTracker() {
 
       <main className="tracker-container animate-fade-in">
         <div className="tracker-top-action">
+          <button 
+            className="btn-view-all-directory"
+            onClick={() => navigate(`/tracker/${productId}/view-all/all`)}
+            title="Open Dedicated Full Table View"
+          >
+            <Table size={15} /> <span>View Full Table</span>
+          </button>
           {!product.isJourney && clients.length > 0 && (
              <button 
                 onClick={() => downloadReport(`${t(`products.${product.id}.name`)} ${t('tracker.report')}`, clients)}
@@ -302,14 +309,23 @@ export default function ClientTracker() {
                     <span className="category-title">{t('tracker.leads_title', { position: t(`options.${position}`) })}</span>
                     <span className="category-count">({positionClients.length})</span>
                   </div>
-                  {positionClients.length > 0 && (
+                  <div className="category-header-actions">
                     <button 
-                      onClick={() => downloadReport(`${position} Leads`, positionClients)}
-                      className="category-report-btn"
+                      onClick={() => navigate(`/tracker/${productId}/view-all/${position}`)}
+                      className="category-viewall-btn"
+                      title={`View full ${position} table`}
                     >
-                      <Download size={14} /> <span>{t('tracker.report')}</span>
+                      <Table size={13} /> <span>View All ({positionClients.length})</span>
                     </button>
-                  )}
+                    {positionClients.length > 0 && (
+                      <button 
+                        onClick={() => downloadReport(`${position} Leads`, positionClients)}
+                        className="category-report-btn"
+                      >
+                        <Download size={14} /> <span>{t('tracker.report')}</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
                 
                 <div className="table-card">
@@ -352,7 +368,11 @@ export default function ClientTracker() {
                   </table>
                   </div>
                   {positionClients.length > 0 && (
-                    <div className="table-footer">
+                    <div 
+                      className="table-footer" 
+                      onClick={() => navigate(`/tracker/${productId}/view-all/${position}`)}
+                      title={`Open dedicated table for ${position} leads`}
+                    >
                       <span className="view-all-link">{t('tracker.view_all')}</span>
                     </div>
                   )}
@@ -413,6 +433,15 @@ export default function ClientTracker() {
                 </tbody>
               </table>
               </div>
+              {clients.length > 0 && (
+                <div 
+                  className="table-footer" 
+                  onClick={() => navigate(`/tracker/${productId}/view-all/all`)}
+                  title="Open dedicated full table for all clients"
+                >
+                  <span className="view-all-link">{t('tracker.view_all')}</span>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -451,15 +480,67 @@ export default function ClientTracker() {
                 
                 if (field.type === 'select') {
                   const selectStyles = {
-                    control: (base) => ({
-                      ...base, padding: '2px', borderRadius: '8px', borderColor: '#e2e8f0', boxShadow: 'none',
+                    control: (base, state) => ({
+                      ...base,
+                      padding: '2px 4px',
+                      borderRadius: '8px',
+                      borderColor: state.isFocused ? '#800000' : '#cbd5e1',
+                      boxShadow: state.isFocused ? '0 0 0 3px rgba(128, 0, 0, 0.12)' : 'none',
                       minHeight: '44px',
-                      '&:hover': { borderColor: '#cbd5e1' }
+                      backgroundColor: '#ffffff',
+                      cursor: 'pointer',
+                      transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+                      '&:hover': { borderColor: '#800000' }
+                    }),
+                    menu: (base) => ({
+                      ...base,
+                      borderRadius: '8px',
+                      boxShadow: '0 10px 25px -5px rgba(128, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08)',
+                      border: '1px solid #fecdd3',
+                      overflow: 'hidden',
+                      zIndex: 9999
+                    }),
+                    menuList: (base) => ({
+                      ...base,
+                      padding: '4px'
                     }),
                     option: (base, state) => ({
-                      ...base, backgroundColor: state.isSelected ? '#800000' : state.isFocused ? '#f8fafc' : 'transparent',
-                      color: state.isSelected ? 'white' : '#0f172a',
-                      padding: '10px 14px'
+                      ...base,
+                      backgroundColor: state.isSelected 
+                        ? '#800000' 
+                        : state.isFocused 
+                        ? '#fff1f2' 
+                        : 'transparent',
+                      color: state.isSelected 
+                        ? '#ffffff' 
+                        : state.isFocused 
+                        ? '#800000' 
+                        : '#0f172a',
+                      fontWeight: state.isSelected ? 600 : 500,
+                      borderRadius: '6px',
+                      margin: '2px 0',
+                      padding: '8px 12px',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.12s ease'
+                    }),
+                    dropdownIndicator: (base, state) => ({
+                      ...base,
+                      color: state.isFocused ? '#800000' : '#800000',
+                      transition: 'color 0.15s ease',
+                      '&:hover': { color: '#650019' }
+                    }),
+                    indicatorSeparator: (base) => ({
+                      ...base,
+                      backgroundColor: '#f1f5f9'
+                    }),
+                    singleValue: (base) => ({
+                      ...base,
+                      color: '#0f172a',
+                      fontWeight: 600
+                    }),
+                    placeholder: (base) => ({
+                      ...base,
+                      color: '#94a3b8'
                     })
                   };
 

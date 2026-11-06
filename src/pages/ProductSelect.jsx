@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { PRODUCTS, logout, getTotalClientsCount } from '../store/DataStore';
@@ -33,6 +33,18 @@ export default function ProductSelect() {
   const [totalProducts, setTotalProducts] = useState(0);
   const [activeClients, setActiveClients] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -86,13 +98,39 @@ export default function ProductSelect() {
         </div>
         
         <div className="header-actions">
-
           <button onClick={handleLogout} className="logout-btn" title={t('dashboard.logout')}>
             <LogOut size={16} strokeWidth={2.5} /> <span className="logout-text">{t('dashboard.logout')}</span>
           </button>
-          <div className="user-avatar-wrap">
-            <div className="user-avatar">K</div>
-            <ChevronDown size={16} className="user-avatar-chevron" />
+          
+          <div className="user-profile-menu-container" ref={profileMenuRef}>
+            <div 
+              className="user-avatar-wrap"
+              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+              title="Account Menu"
+            >
+              <div className="user-avatar">K</div>
+              <ChevronDown size={16} className={`user-avatar-chevron ${isProfileMenuOpen ? 'chevron-rotated' : ''}`} />
+            </div>
+
+            {isProfileMenuOpen && (
+              <div className="profile-dropdown-menu animate-fade-in">
+                <div className="profile-dropdown-user">
+                  <div className="profile-avatar-large">K</div>
+                  <div className="profile-user-info">
+                    <span className="profile-user-name">Krishnaniti Admin</span>
+                    <span className="profile-user-email">krishnaniti@gmail.com</span>
+                  </div>
+                </div>
+                <div className="profile-dropdown-divider"></div>
+                <button 
+                  className="profile-dropdown-item" 
+                  onClick={handleLogout}
+                >
+                  <LogOut size={15} />
+                  <span>Logout</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>

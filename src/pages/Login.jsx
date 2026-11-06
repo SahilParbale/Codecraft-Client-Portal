@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
   ShieldCheck, Mail, Lock, Eye, EyeOff, ArrowRight, 
   Sparkles, Layers, Activity, Wifi, CheckCircle2 
 } from 'lucide-react';
-import { setAuth } from '../store/DataStore';
+import { setAuth, getAuth } from '../store/DataStore';
 import './Login.css';
 
 export default function Login() {
@@ -16,9 +16,14 @@ export default function Login() {
   const [isDark, setIsDark] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
+  const [hasActiveSession, setHasActiveSession] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    setHasActiveSession(getAuth());
+  }, []);
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -167,6 +172,27 @@ export default function Login() {
               <p>{t('login.portal_title')}</p>
               <div className="small-line"></div>
             </div>
+
+            {/* Active Session Quick Resume Banner */}
+            {hasActiveSession && (
+              <div className="active-session-banner">
+                <div className="active-session-text">
+                  <CheckCircle2 size={15} className="session-icon" />
+                  <span>Session Active: <strong>krishnaniti@gmail.com</strong></span>
+                </div>
+                <button
+                  type="button"
+                  className="session-resume-btn"
+                  onClick={() => {
+                    const savedPath = localStorage.getItem('codecraft_last_visited_path');
+                    const target = location.state?.from?.pathname || (savedPath && savedPath !== '/' && !savedPath.includes('login') ? savedPath : '/products');
+                    navigate(target, { replace: true });
+                  }}
+                >
+                  Continue to Workspace <ArrowRight size={13} />
+                </button>
+              </div>
+            )}
 
             {/* Login Form */}
             <form onSubmit={handleLogin} className="login-form-element">

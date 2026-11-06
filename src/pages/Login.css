@@ -437,6 +437,52 @@
     border-radius: 3px;
 }
 
+/* Active Session Banner */
+.active-session-banner {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: clamp(10px, 1.6vh, 16px);
+}
+
+.active-session-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #166534;
+}
+
+.session-icon {
+    color: #16a34a;
+    flex-shrink: 0;
+}
+
+.session-resume-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 12px;
+    background: #16a34a;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.session-resume-btn:hover {
+    background: #15803d;
+    transform: translateY(-1px);
+}
+
 /* Form Fields */
 .login-form-element {
     display: flex;

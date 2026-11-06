@@ -377,24 +377,91 @@
     color: #64748b;
 }
 
+/* Category Header Actions */
+.category-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.category-viewall-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 11px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    background-color: #ffffff;
+    color: #800000;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.category-viewall-btn:hover {
+    background-color: #fff1f2;
+    border-color: #fca5a5;
+    color: #650019;
+    transform: translateY(-1px);
+}
+
+.btn-view-all-directory {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background-color: #ffffff;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.btn-view-all-directory:hover {
+    background-color: #f8fafc;
+    color: #800000;
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 5px rgba(128, 0, 0, 0.06);
+    transform: translateY(-1px);
+}
+
 /* View All Footer */
 .table-footer {
     padding: 12px 20px;
-    background-color: #fcfcfd;
+    background-color: #fafbfd;
     border-top: 1px solid #f1f5f9;
-    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.table-footer:hover {
+    background-color: #fff1f2;
 }
 
 .view-all-link {
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
     color: #800000;
     text-decoration: none;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s ease;
 }
 
-.view-all-link:hover {
+.table-footer:hover .view-all-link {
+    color: #650019;
     text-decoration: underline;
+    transform: translateX(3px);
 }
 
 /* Modal Styling */

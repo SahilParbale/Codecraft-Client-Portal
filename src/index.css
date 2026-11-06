@@ -144,7 +144,7 @@ body {
 select.input-field {
   appearance: none;
   -webkit-appearance: none;
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23800000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 1rem center;
   padding-right: 2.5rem;
@@ -596,4 +596,103 @@ body {
     user-select: none;
     -webkit-user-select: none;
   }
+}
+
+/* ========================================================================= */
+/* Global Codecraft Maroon Theme Overrides for Dropdowns & DatePickers       */
+/* ========================================================================= */
+
+/* Native HTML <select> elements across the app */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23800000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px 12px;
+  padding-right: 30px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+select:hover {
+  border-color: #800000;
+}
+
+select:focus {
+  border-color: #800000;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(128, 0, 0, 0.12);
+}
+
+select option {
+  background-color: #ffffff;
+  color: #0f172a;
+  padding: 8px 12px;
+}
+
+/* React Datepicker Theme Overrides */
+.react-datepicker {
+  font-family: inherit !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 10px 25px -5px rgba(128, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08) !important;
+  overflow: hidden !important;
+}
+
+.react-datepicker__header {
+  background-color: #800000 !important;
+  border-bottom: 1px solid #650019 !important;
+  padding-top: 10px !important;
+}
+
+.react-datepicker__current-month,
+.react-datepicker-time__header,
+.react-datepicker__day-name {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: #ffffff !important;
+  border-width: 2px 2px 0 0 !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: #800000 !important;
+  color: #ffffff !important;
+  border-radius: 6px !important;
+  font-weight: 700 !important;
+}
+
+.react-datepicker__day:hover {
+  background-color: #fff1f2 !important;
+  color: #800000 !important;
+  border-radius: 6px !important;
+}
+
+.react-datepicker__day--today {
+  font-weight: 800 !important;
+  color: #800000 !important;
+}
+
+.react-datepicker__time-container {
+  border-left: 1px solid #e2e8f0 !important;
+}
+
+.react-datepicker__time-container .react-datepicker__time {
+  background: #ffffff !important;
+}
+
+.react-datepicker__time-list-item--selected {
+  background-color: #800000 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.react-datepicker__time-list-item:hover {
+  background-color: #fff1f2 !important;
+  color: #800000 !important;
 }

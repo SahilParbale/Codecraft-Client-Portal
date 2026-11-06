@@ -1,5 +1,5 @@
 // Codecraft Client Manager - Service Worker
-const CACHE_NAME = 'codecraft-pwa-v4';
+const CACHE_NAME = 'codecraft-pwa-v5';
 const OFFLINE_URL = '/offline.html';
 
 const PRECACHE_ASSETS = [

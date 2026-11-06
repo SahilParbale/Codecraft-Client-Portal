@@ -232,6 +232,39 @@ export const updateClient = async (productId, clientId, updatedData) => {
   return null;
 };
 
+// Delete client from Supabase and local cache
+export const deleteClient = async (productId, clientId) => {
+  try {
+    const { error } = await supabase
+      .from('clients')
+      .delete()
+      .eq('id', clientId);
+
+    if (!error) {
+      try {
+        const cached = JSON.parse(localStorage.getItem(CACHE_PREFIX + productId) || '[]');
+        const updated = cached.filter(c => String(c.id) !== String(clientId));
+        localStorage.setItem(CACHE_PREFIX + productId, JSON.stringify(updated));
+      } catch {
+        // Ignore cache write error
+      }
+      return true;
+    }
+  } catch (err) {
+    console.warn('Network issue deleting client, updating local cache:', err);
+  }
+
+  // Fallback to local cache deletion
+  try {
+    const cached = JSON.parse(localStorage.getItem(CACHE_PREFIX + productId) || '[]');
+    const updated = cached.filter(c => String(c.id) !== String(clientId));
+    localStorage.setItem(CACHE_PREFIX + productId, JSON.stringify(updated));
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 // Persist auth in both localStorage and sessionStorage so refresh/new window never loses session
 export const setAuth = (isLoggedIn) => {
   const payload = JSON.stringify({ isLoggedIn: Boolean(isLoggedIn) });
